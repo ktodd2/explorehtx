@@ -149,9 +149,10 @@ function normalizeEvent(raw: TmEvent): NormalizedEvent | null {
 
   if (!startDate) return null
 
-  const endDate = raw.dates?.end?.dateTime ?? raw.dates?.end?.localDate
-    ? `${raw.dates?.end?.localDate}T00:00:00`
-    : undefined
+  const endDate = raw.dates?.end?.dateTime
+    ?? (raw.dates?.end?.localDate
+      ? `${raw.dates.end.localDate}T00:00:00`
+      : undefined)
 
   const isAllDay =
     raw.dates?.start?.noSpecificTime === true ||

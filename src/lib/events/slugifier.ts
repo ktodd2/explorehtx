@@ -33,11 +33,24 @@ function formatDateSuffix(startDate: string): string {
  *   "Houston Rodeo 2026" + "2026-02-18T..." → "houston-rodeo-2026-20260218"
  *   "" + "2026-01-01T..."                   → "event-20260101"
  */
-export function generateEventSlug(title: string, startDate: string): string {
+/**
+ * Simple hash to create a short unique suffix from a string (e.g. external ID).
+ * Returns a lowercase alphanumeric string of the given length.
+ */
+function shortHash(input: string, length = 6): string {
+  let hash = 0
+  for (let i = 0; i < input.length; i++) {
+    hash = ((hash << 5) - hash + input.charCodeAt(i)) | 0
+  }
+  return Math.abs(hash).toString(36).padStart(length, '0').slice(0, length)
+}
+
+export function generateEventSlug(title: string, startDate: string, externalId?: string): string {
   const dateSuffix = `-${formatDateSuffix(startDate)}`
+  const idSuffix = externalId ? `-${shortHash(externalId)}` : ''
 
   // Maximum characters available for the title portion.
-  const maxTitleLength = MAX_SLUG_LENGTH - dateSuffix.length
+  const maxTitleLength = MAX_SLUG_LENGTH - dateSuffix.length - idSuffix.length
 
   const rawTitle = title.trim() || 'event'
   let sluggedTitle = slugify(rawTitle)
@@ -58,5 +71,5 @@ export function generateEventSlug(title: string, startDate: string): string {
     sluggedTitle = 'event'
   }
 
-  return `${sluggedTitle}${dateSuffix}`
+  return `${sluggedTitle}${dateSuffix}${idSuffix}`
 }

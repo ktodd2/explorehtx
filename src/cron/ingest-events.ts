@@ -114,7 +114,7 @@ async function updateIngestionLogComplete(
 // ---------------------------------------------------------------------------
 
 function toInsertEvent(event: NormalizedEvent, category: string, neighborhood: string | null): InsertEvent {
-  const slug = generateEventSlug(event.title, event.startDate)
+  const slug = generateEventSlug(event.title, event.startDate, event.externalId)
 
   return {
     external_id:    event.externalId,
