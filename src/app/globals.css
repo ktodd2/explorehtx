@@ -1,26 +1,78 @@
 @import "tailwindcss";
 
+/* ============================================================
+   ExploreHTX Design System — Houston Theme
+   Tailwind v4 — @theme inline token definitions
+   ============================================================ */
+
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #1a1a2e;
+  --font-display: var(--font-display);
+  --font-body: var(--font-inter);
+  --font-mono: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, monospace;
 }
 
 @theme inline {
+  /* ── Core surface tokens ── */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  /* ── Font tokens ── */
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
+  --font-mono: var(--font-mono);
+
+  /* ── Space Blue — NASA/Space Center Houston deep navy ── */
+  --color-space-blue-50: #e8edf7;
+  --color-space-blue-100: #c5d0ea;
+  --color-space-blue-200: #9eb0db;
+  --color-space-blue-300: #7790cb;
+  --color-space-blue-400: #5a77bf;
+  --color-space-blue-500: #3d5db3;
+  --color-space-blue-600: #2e4a9e;
+  --color-space-blue-700: #1e3584;
+  --color-space-blue-800: #122268;
+  --color-space-blue-900: #0a2463;
+
+  /* ── Sunset Orange — warm Houston horizon glow ── */
+  --color-sunset-orange-50: #fff4ed;
+  --color-sunset-orange-100: #ffe4cc;
+  --color-sunset-orange-200: #ffc799;
+  --color-sunset-orange-300: #ffa366;
+  --color-sunset-orange-400: #ff8533;
+  --color-sunset-orange-500: #f97316;
+  --color-sunset-orange-600: #ea6a08;
+  --color-sunset-orange-700: #c45a06;
+  --color-sunset-orange-800: #9e4905;
+  --color-sunset-orange-900: #7a3804;
+
+  /* ── Brand spot colors ── */
+  --color-houston-red: #bf0d3e;
+  --color-astros-orange: #eb6e1f;
+
+  /* ── Neutral grays ── */
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ── Base resets & global defaults ── */
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
