@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "build:cron": "tsc --project tsconfig.cron.json"
   },
   "dependencies": {
     "@react-email/components": "^1.0.9",
