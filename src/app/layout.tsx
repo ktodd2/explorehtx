@@ -93,6 +93,20 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} ${bricolage.variable}`}>
       <body className="antialiased min-h-screen flex flex-col bg-background text-foreground">
 
+        {/* Google Analytics (GA4) */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-J1M076GZRM"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-J1M076GZRM');
+          `}
+        </Script>
+
         {/* AdSense — production only */}
         {process.env.NODE_ENV === 'production' && adSenseId && (
           <Script
