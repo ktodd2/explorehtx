@@ -8,8 +8,16 @@
 
 import 'dotenv/config'
 
-import { TicketmasterAdapter } from '../lib/events/adapters/ticketmaster'
-import { EventbriteAdapter }   from '../lib/events/adapters/eventbrite'
+import { TicketmasterAdapter }    from '../lib/events/adapters/ticketmaster'
+import { EventbriteAdapter }     from '../lib/events/adapters/eventbrite'
+import { MeetupAdapter }         from '../lib/events/adapters/meetup'
+import { VisitHoustonAdapter }   from '../lib/events/adapters/visit-houston'
+import { CultureMapAdapter }     from '../lib/events/adapters/culturemap'
+import { Do713Adapter }          from '../lib/events/adapters/do713'
+import { MuseumDistrictAdapter } from '../lib/events/adapters/museum-district'
+import { HoustonPressAdapter }   from '../lib/events/adapters/houston-press'
+import { PredictHQAdapter }      from '../lib/events/adapters/predicthq'
+import { FacebookEventsAdapter } from '../lib/events/adapters/facebook-events'
 import type { NormalizedEvent }     from '../lib/events/adapters/base'
 import { deduplicateEvents }   from '../lib/events/deduplicator'
 import { categorizeEvent }     from '../lib/events/categorizer'
@@ -217,6 +225,14 @@ async function runIngestion(): Promise<void> {
   const adapters = [
     new TicketmasterAdapter(),
     new EventbriteAdapter(),
+    new MeetupAdapter(),
+    new VisitHoustonAdapter(),
+    new CultureMapAdapter(),
+    new Do713Adapter(),
+    new MuseumDistrictAdapter(),
+    new HoustonPressAdapter(),
+    new PredictHQAdapter(),
+    new FacebookEventsAdapter(),
   ]
 
   log(`Running ${adapters.length} adapter(s) in parallel...`)
