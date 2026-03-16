@@ -1,0 +1,122 @@
+services:
+  # ---------------------------------------------------------------------------
+  # Web service — Next.js app
+  # ---------------------------------------------------------------------------
+  - type: web
+    name: explorehtx
+    runtime: node
+    region: oregon
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: TICKETMASTER_API_KEY
+        sync: false
+      - key: EVENTBRITE_API_TOKEN
+        sync: false
+      - key: NEXT_PUBLIC_ADSENSE_CLIENT_ID
+        sync: false
+      - key: NEXT_PUBLIC_SITE_URL
+        value: https://explorehtx.us.com
+      - key: CRON_SECRET
+        generateValue: true
+
+  # ---------------------------------------------------------------------------
+  # Cron — Event ingestion (every 6 hours)
+  # ---------------------------------------------------------------------------
+  - type: cron
+    name: explorehtx-ingest
+    runtime: node
+    region: oregon
+    plan: free
+    schedule: "0 */6 * * *"
+    buildCommand: npm install && npm run build:cron
+    startCommand: node dist/cron/ingest-events.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: TICKETMASTER_API_KEY
+        sync: false
+      - key: EVENTBRITE_API_TOKEN
+        sync: false
+
+  # ---------------------------------------------------------------------------
+  # Cron — Blog post generation (Mon & Thu at 5 AM CT = 10:00 UTC)
+  # ---------------------------------------------------------------------------
+  - type: cron
+    name: explorehtx-blog
+    runtime: node
+    region: oregon
+    plan: free
+    schedule: "0 10 * * 1,4"
+    buildCommand: npm install && npm run build:cron
+    startCommand: node dist/cron/generate-blog.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: NEXT_PUBLIC_SITE_URL
+        value: https://explorehtx.us.com
+
+  # ---------------------------------------------------------------------------
+  # Cron — Weekly digest email (Friday at 8 AM CT = 13:00 UTC)
+  # ---------------------------------------------------------------------------
+  - type: cron
+    name: explorehtx-digest
+    runtime: node
+    region: oregon
+    plan: free
+    schedule: "0 13 * * 5"
+    buildCommand: npm install && npm run build:cron
+    startCommand: node dist/cron/send-digest.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: NEXT_PUBLIC_SITE_URL
+        value: https://explorehtx.us.com
+
+  # ---------------------------------------------------------------------------
+  # Cron — Database cleanup (Sunday at 3 AM CT = 08:00 UTC)
+  # ---------------------------------------------------------------------------
+  - type: cron
+    name: explorehtx-cleanup
+    runtime: node
+    region: oregon
+    plan: free
+    schedule: "0 8 * * 0"
+    buildCommand: npm install && npm run build:cron
+    startCommand: node dist/cron/cleanup.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false

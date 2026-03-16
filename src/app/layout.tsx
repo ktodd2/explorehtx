@@ -3,6 +3,7 @@ import { Inter, Bricolage_Grotesque } from 'next/font/google';
 import Script from 'next/script';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import WebsiteJsonLd from '@/components/seo/WebsiteJsonLd';
 import './globals.css';
 
 const inter = Inter({
@@ -101,6 +102,7 @@ export default function RootLayout({
           />
         )}
 
+        <WebsiteJsonLd />
         <Header />
 
         <main className="flex-1">
