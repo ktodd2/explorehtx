@@ -69,6 +69,8 @@ interface TmEvent {
     venues?: TmVenue[]
   }
   promoter?: { name?: string }
+  pleaseNote?: string
+  additionalInfo?: string
   [key: string]: unknown
 }
 
@@ -174,8 +176,30 @@ function normalizeEvent(raw: TmEvent): NormalizedEvent | null {
   const priceMax = ticketRange?.max
   const isFree = priceMin === 0 && (priceMax === 0 || priceMax === undefined)
 
-  // Description — Ticketmaster often has `info` instead of `description`
-  const description = raw.description ?? raw.info ?? ''
+  // Description — build from available fields
+  const descParts: string[] = []
+  if (raw.description) descParts.push(raw.description)
+  else if (raw.info) descParts.push(raw.info)
+  if (raw.pleaseNote) descParts.push(raw.pleaseNote)
+  if (raw.additionalInfo) descParts.push(raw.additionalInfo)
+
+  // If still empty, build a basic description from classification + venue
+  if (descParts.length === 0) {
+    const segment = raw.classifications?.[0]?.segment?.name
+    const genre = raw.classifications?.[0]?.genre?.name
+    const subGenre = raw.classifications?.[0]?.subGenre?.name
+    const typeInfo = [segment, genre, subGenre]
+      .filter((v) => v && v !== 'Undefined')
+      .join(' / ')
+    if (typeInfo) {
+      descParts.push(`${raw.name ?? 'Event'} — ${typeInfo}.`)
+    }
+    if (venueName) {
+      descParts.push(`Taking place at ${venueName}${venueAddress ? `, ${venueAddress}` : ''}.`)
+    }
+  }
+
+  const description = descParts.join('\n\n')
 
   return {
     externalId: id,

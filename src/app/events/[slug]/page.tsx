@@ -252,23 +252,47 @@ export default async function EventDetailPage({ params }: PageProps) {
           {/* Left — main content */}
           <div className="lg:col-span-2 space-y-8">
             {/* Description */}
-            {(event.description_html || event.description) && (
-              <section>
-                <h2 className="font-display text-xl font-bold text-gray-900 mb-4">
-                  About This Event
-                </h2>
-                {event.description_html ? (
-                  <div
-                    className="prose prose-gray max-w-none leading-relaxed"
-                    dangerouslySetInnerHTML={{ __html: event.description_html }}
-                  />
-                ) : (
-                  <p className="text-gray-700 leading-relaxed whitespace-pre-line">
-                    {event.description}
+            <section>
+              <h2 className="font-display text-xl font-bold text-gray-900 mb-4">
+                About This Event
+              </h2>
+              {event.description_html ? (
+                <div
+                  className="prose prose-gray max-w-none leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: event.description_html }}
+                />
+              ) : event.description ? (
+                <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                  {event.description}
+                </p>
+              ) : (
+                <div className="text-gray-700 leading-relaxed space-y-3">
+                  <p>
+                    <strong>{event.title}</strong> is a{' '}
+                    {categoryName.toLowerCase()} event happening in Houston
+                    {event.venue_name ? ` at ${event.venue_name}` : ''}.
                   </p>
-                )}
-              </section>
-            )}
+                  <p>
+                    <strong>When:</strong> {dateDisplay}
+                    {event.is_all_day ? ' (All day)' : ''}
+                  </p>
+                  {event.venue_name && (
+                    <p>
+                      <strong>Where:</strong> {event.venue_name}
+                      {event.venue_address ? `, ${event.venue_address}` : ''}
+                    </p>
+                  )}
+                  <p>
+                    <strong>Admission:</strong> {price}
+                  </p>
+                  {event.ticket_url && (
+                    <p>
+                      Visit the event page for full details, ticket availability, and more information.
+                    </p>
+                  )}
+                </div>
+              )}
+            </section>
 
             {/* Tags */}
             {event.tags && event.tags.length > 0 && (

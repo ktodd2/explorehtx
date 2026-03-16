@@ -18,6 +18,10 @@ import {
   Clock,
   Sparkles,
 } from 'lucide-react';
+import { createClient } from '@/lib/supabase/server';
+import EventCard from '@/components/events/EventCard';
+import BlogCard from '@/components/blog/BlogCard';
+import type { Event, BlogPost } from '@/types/database';
 
 const CATEGORIES = [
   { name: 'Music & Concerts', slug: 'music-concerts', icon: Music, color: 'bg-purple-100 text-purple-700' },
@@ -41,7 +45,29 @@ const QUICK_LINKS = [
   { label: 'This Month', href: '/events/this-month', icon: Sparkles, description: 'Full month ahead' },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const supabase = await createClient();
+
+  const [eventsResult, blogResult] = await Promise.all([
+    supabase
+      .from('events')
+      .select('*')
+      .eq('status', 'active')
+      .gte('start_date', new Date().toISOString())
+      .order('featured', { ascending: false })
+      .order('start_date', { ascending: true })
+      .limit(6),
+    supabase
+      .from('blog_posts')
+      .select('*')
+      .eq('status', 'published')
+      .order('published_at', { ascending: false })
+      .limit(3),
+  ]);
+
+  const events = (eventsResult.data as Event[]) ?? [];
+  const blogPosts = (blogResult.data as BlogPost[]) ?? [];
+
   return (
     <>
       {/* Hero Section */}
@@ -115,7 +141,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Featured Events Placeholder */}
+      {/* Upcoming Events */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -132,37 +158,17 @@ export default function Home() {
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div
-              key={i}
-              className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg transition-shadow"
-            >
-              <div className="h-48 bg-gradient-to-br from-space-blue-100 to-space-blue-200 flex items-center justify-center">
-                <Calendar className="w-12 h-12 text-space-blue-400" />
-              </div>
-              <div className="p-5">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="px-2.5 py-0.5 bg-sunset-orange-100 text-sunset-orange-700 text-xs font-medium rounded-full">
-                    Coming Soon
-                  </span>
-                </div>
-                <h3 className="font-semibold text-gray-900 text-lg">Event Loading...</h3>
-                <p className="text-sm text-gray-500 mt-1">
-                  Events will appear here once the ingestion pipeline is connected.
-                </p>
-                <div className="mt-4 flex items-center gap-4 text-sm text-gray-400">
-                  <span className="flex items-center gap-1">
-                    <MapPin className="w-4 h-4" /> Houston, TX
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-4 h-4" /> TBD
-                  </span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        {events.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {events.map((event) => (
+              <EventCard key={event.id} event={event} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-center text-gray-500 py-12">
+            No upcoming events yet. Check back soon!
+          </p>
+        )}
         <div className="mt-8 text-center sm:hidden">
           <Link
             href="/events"
@@ -203,7 +209,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Blog Highlights Placeholder */}
+      {/* From the Blog */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -220,27 +226,35 @@ export default function Home() {
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {['Weekend Guide', 'Neighborhood Spotlight', 'Best Free Events'].map((title) => (
-            <div
-              key={title}
-              className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg transition-shadow"
-            >
-              <div className="h-40 bg-gradient-to-br from-sunset-orange-100 to-sunset-orange-200 flex items-center justify-center">
-                <Sparkles className="w-10 h-10 text-sunset-orange-400" />
+        {blogPosts.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {blogPosts.map((post) => (
+              <BlogCard key={post.id} post={post} />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {['Weekend Guide', 'Neighborhood Spotlight', 'Best Free Events'].map((title) => (
+              <div
+                key={title}
+                className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100"
+              >
+                <div className="h-40 bg-gradient-to-br from-sunset-orange-100 to-sunset-orange-200 flex items-center justify-center">
+                  <Sparkles className="w-10 h-10 text-sunset-orange-400" />
+                </div>
+                <div className="p-5">
+                  <span className="text-xs font-medium text-sunset-orange-600 uppercase tracking-wide">
+                    Coming Soon
+                  </span>
+                  <h3 className="font-semibold text-gray-900 text-lg mt-1">{title}</h3>
+                  <p className="text-sm text-gray-500 mt-2 line-clamp-2">
+                    AI-generated blog posts about Houston events will appear here automatically.
+                  </p>
+                </div>
               </div>
-              <div className="p-5">
-                <span className="text-xs font-medium text-sunset-orange-600 uppercase tracking-wide">
-                  Coming Soon
-                </span>
-                <h3 className="font-semibold text-gray-900 text-lg mt-1">{title}</h3>
-                <p className="text-sm text-gray-500 mt-2 line-clamp-2">
-                  AI-generated blog posts about Houston events will appear here automatically.
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Newsletter CTA */}
