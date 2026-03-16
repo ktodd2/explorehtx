@@ -299,10 +299,26 @@ async function runIngestion(): Promise<void> {
   // ------------------------------------------------------------------
   log('Categorizing, geocoding, and building DB records...')
 
-  const insertRecords: InsertEvent[] = deduplicated.map((event) => {
+  // Filter out events with missing or empty dates (prevents DB timestamp errors)
+  const validEvents = deduplicated.filter((event) => {
+    if (!event.startDate || event.startDate.trim() === '') {
+      log(`Skipping event "${event.title}" from ${event.source}: missing startDate`)
+      return false
+    }
+    return true
+  })
+
+  if (validEvents.length < deduplicated.length) {
+    log(`Filtered out ${deduplicated.length - validEvents.length} event(s) with invalid dates.`)
+  }
+
+  const insertRecords: InsertEvent[] = validEvents.map((event) => {
     const category     = categorizeEvent(event)
     const neighborhood = assignNeighborhood(event.lat, event.lng, event.venueAddress)
-    return toInsertEvent(event, category, neighborhood)
+    const record = toInsertEvent(event, category, neighborhood)
+    // Ensure empty strings don't get sent as timestamps
+    if (record.end_date === '') record.end_date = null
+    return record
   })
 
   log(`Prepared ${insertRecords.length} records for upsert.`)
