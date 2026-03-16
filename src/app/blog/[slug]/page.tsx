@@ -23,10 +23,6 @@ import type { BlogPost, BlogPostType, Event } from '@/types/database'
 // Static params (empty — posts are generated dynamically)
 // ---------------------------------------------------------------------------
 
-export async function generateStaticParams() {
-  return []
-}
-
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------

@@ -13,12 +13,6 @@ interface NeighborhoodPageProps {
   params: Promise<{ slug: string }>;
 }
 
-export async function generateStaticParams() {
-  // Return empty array — neighborhoods will be generated on-demand via ISR
-  // (Using createClient here would fail at build time since cookies() isn't available)
-  return [];
-}
-
 export async function generateMetadata({
   params,
 }: NeighborhoodPageProps): Promise<Metadata> {
