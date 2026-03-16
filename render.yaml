@@ -40,7 +40,6 @@ services:
     name: explorehtx-ingest
     runtime: node
     region: oregon
-    plan: free
     schedule: "0 */6 * * *"
     buildCommand: npm install && npm run build:cron
     startCommand: node dist/cron/ingest-events.js
@@ -63,7 +62,6 @@ services:
     name: explorehtx-blog
     runtime: node
     region: oregon
-    plan: free
     schedule: "0 10 * * 1,4"
     buildCommand: npm install && npm run build:cron
     startCommand: node dist/cron/generate-blog.js
@@ -86,7 +84,6 @@ services:
     name: explorehtx-digest
     runtime: node
     region: oregon
-    plan: free
     schedule: "0 13 * * 5"
     buildCommand: npm install && npm run build:cron
     startCommand: node dist/cron/send-digest.js
@@ -109,7 +106,6 @@ services:
     name: explorehtx-cleanup
     runtime: node
     region: oregon
-    plan: free
     schedule: "0 8 * * 0"
     buildCommand: npm install && npm run build:cron
     startCommand: node dist/cron/cleanup.js
