@@ -86,7 +86,7 @@ export async function generateBlogPost(
 
   // ── 1. Call OpenAI ──────────────────────────────────────────────────────
   const completion = await openai.chat.completions.create({
-    model: 'gpt-4o-mini',
+    model: 'gpt-4.1-nano',
     messages: [
       { role: 'system', content: prompts.system },
       { role: 'user', content: prompts.user },
@@ -152,7 +152,7 @@ export async function generateBlogPost(
     status: 'published',
     published_at: now,
     ai_generated: true,
-    ai_model: 'gpt-4o-mini',
+    ai_model: 'gpt-4.1-nano',
     ai_prompt_hash: promptHash,
     word_count: wordCount,
     reading_time_minutes: readingTimeMinutes,

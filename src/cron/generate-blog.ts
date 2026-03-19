@@ -2,11 +2,14 @@
 // ExploreHTX — AI Blog Generation Cron Job
 // Runs on a schedule to produce AI-generated blog posts about Houston events.
 //
-// Schedule logic (based on day of week + date):
-//   Monday        → weekly preview (this week's events)
-//   Thursday      → weekend roundup
-//   1st of month  → monthly roundup (uses weekly-preview template, month scope)
-//   Other days    → alternate between neighborhood spotlight and listicle
+// Schedule: twice daily (5 AM CT / 5 PM CT)
+//   AM run (primary content):
+//     Monday        → weekly preview
+//     Thursday      → weekend roundup
+//     1st of month  → monthly roundup
+//     Other days    → neighborhood guide
+//   PM run (secondary content):
+//     Always a listicle (rotates through types daily)
 //
 // Usage (standalone Node.js after compilation):
 //   node dist/src/cron/generate-blog.js
@@ -51,6 +54,7 @@ function getCentralDate(d: Date = new Date()): {
   month: number
   day: number
   dayOfWeek: number  // 0=Sun, 1=Mon … 6=Sat
+  hour: number       // 0-23 in Central Time
 } {
   const parts = new Intl.DateTimeFormat('en-US', {
     timeZone: 'America/Chicago',
@@ -58,11 +62,14 @@ function getCentralDate(d: Date = new Date()): {
     month: '2-digit',
     day: '2-digit',
     weekday: 'short',
+    hour: 'numeric',
+    hour12: false,
   }).formatToParts(d)
 
   const year   = parseInt(parts.find((p) => p.type === 'year')!.value, 10)
   const month  = parseInt(parts.find((p) => p.type === 'month')!.value, 10) // 1-based
   const day    = parseInt(parts.find((p) => p.type === 'day')!.value, 10)
+  const hour   = parseInt(parts.find((p) => p.type === 'hour')!.value, 10)
 
   const weekdayMap: Record<string, number> = {
     Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6,
@@ -70,7 +77,7 @@ function getCentralDate(d: Date = new Date()): {
   const weekdayStr = parts.find((p) => p.type === 'weekday')!.value.slice(0, 3)
   const dayOfWeek = weekdayMap[weekdayStr] ?? d.getDay()
 
-  return { year, month, day, dayOfWeek }
+  return { year, month, day, dayOfWeek, hour }
 }
 
 /** Format a date range label: "March 17–23, 2025" */
@@ -355,18 +362,22 @@ type JobType =
   | 'listicle'
 
 function determineJobType(centralDate: ReturnType<typeof getCentralDate>): JobType {
-  // 1st of month → monthly roundup (highest priority)
-  if (centralDate.day === 1) return 'monthly-roundup'
+  const isAM = centralDate.hour < 12
 
-  // Monday → weekly preview
-  if (centralDate.dayOfWeek === 1) return 'weekly-preview'
+  if (isAM) {
+    // ── Morning run: primary content ──────────────────────────────────────
+    // 1st of month → monthly roundup (highest priority)
+    if (centralDate.day === 1) return 'monthly-roundup'
+    // Monday → weekly preview
+    if (centralDate.dayOfWeek === 1) return 'weekly-preview'
+    // Thursday → weekend roundup
+    if (centralDate.dayOfWeek === 4) return 'weekend-roundup'
+    // All other days → neighborhood guide
+    return 'neighborhood-guide'
+  }
 
-  // Thursday → weekend roundup
-  if (centralDate.dayOfWeek === 4) return 'weekend-roundup'
-
-  // Other days: alternate between neighborhood guide and listicle
-  // Even day-of-year → neighborhood; odd → listicle
-  return getDayOfYear() % 2 === 0 ? 'neighborhood-guide' : 'listicle'
+  // ── Afternoon run: always a listicle (rotates daily) ─────────────────
+  return 'listicle'
 }
 
 // ---------------------------------------------------------------------------
@@ -378,7 +389,7 @@ async function runBlogGeneration(): Promise<void> {
   const now = new Date()
   const centralDate = getCentralDate(now)
 
-  log(`Starting blog generation. Central date: ${centralDate.year}-${centralDate.month}-${centralDate.day} (dayOfWeek: ${centralDate.dayOfWeek})`)
+  log(`Starting blog generation. Central date: ${centralDate.year}-${centralDate.month}-${centralDate.day} (dayOfWeek: ${centralDate.dayOfWeek}, hour: ${centralDate.hour}, run: ${centralDate.hour < 12 ? 'AM' : 'PM'})`)
 
   const supabase = createAdminClient()
   const logId = await insertIngestionLog(supabase, new Date(startTime))

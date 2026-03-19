@@ -56,13 +56,13 @@ services:
         sync: false
 
   # ---------------------------------------------------------------------------
-  # Cron — Blog post generation (Mon & Thu at 5 AM CT = 10:00 UTC)
+  # Cron — Blog post generation (twice daily: 5 AM & 5 PM CT)
   # ---------------------------------------------------------------------------
   - type: cron
     name: explorehtx-blog
     runtime: node
     region: oregon
-    schedule: "0 10 * * 1,4"
+    schedule: "0 10,22 * * *"
     buildCommand: npm install && npm run build:cron
     startCommand: node dist/cron/generate-blog.js
     envVars:
