@@ -116,3 +116,23 @@ services:
         sync: false
       - key: SUPABASE_SERVICE_ROLE_KEY
         sync: false
+
+  # ---------------------------------------------------------------------------
+  # Cron — Restaurant discovery (Sunday at 6 PM CT = 23:00 UTC)
+  # ---------------------------------------------------------------------------
+  - type: cron
+    name: explorehtx-restaurants
+    runtime: node
+    region: oregon
+    schedule: "0 23 * * 0"
+    buildCommand: npm install && npm run build:cron
+    startCommand: node dist/cron/discover-restaurants.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false

@@ -250,6 +250,12 @@ export interface Restaurant {
   has_happy_hour: boolean
   created_at: string
   updated_at: string
+
+  // Discovery tracking (AI-generated restaurants)
+  ai_generated: boolean
+  discovery_source: string | null   // 'manual', 'ai-research'
+  confidence_score: number | null   // 0-100
+  last_featured_at: string | null
 }
 
 /**

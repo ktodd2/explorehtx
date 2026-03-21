@@ -264,26 +264,52 @@ async function fetchDateNightRestaurants(
 
 async function fetchFeaturedRestaurant(
   supabase: ReturnType<typeof createAdminClient>,
-  dayOfYear: number
+  _dayOfYear: number
 ): Promise<Restaurant | null> {
-  // Fetch all featured restaurants and rotate through them
+  // Fetch featured restaurant that was least recently featured
+  // This ensures variety and uses the new last_featured_at tracking
   const { data, error } = await supabase
     .from('restaurants')
     .select('*')
     .eq('status', 'active')
     .eq('featured', true)
-    .order('popularity_score', { ascending: false })
+    .order('last_featured_at', { ascending: true, nullsFirst: true })
+    .limit(1)
+    .single()
 
   if (error) {
-    logError('Error fetching featured restaurants', error)
-    return null
+    // Could be no featured restaurants — fallback to popularity-based selection
+    const { data: fallbackData, error: fallbackError } = await supabase
+      .from('restaurants')
+      .select('*')
+      .eq('status', 'active')
+      .eq('featured', true)
+      .order('popularity_score', { ascending: false })
+      .limit(1)
+      .single()
+
+    if (fallbackError) {
+      logError('Error fetching featured restaurants', fallbackError)
+      return null
+    }
+
+    return fallbackData as Restaurant | null
   }
 
-  const restaurants = (data as Restaurant[]) ?? []
-  if (restaurants.length === 0) return null
+  const restaurant = data as Restaurant
 
-  // Rotate based on day of year
-  return restaurants[dayOfYear % restaurants.length]
+  // Update last_featured_at to now (fire-and-forget)
+  supabase
+    .from('restaurants')
+    .update({ last_featured_at: new Date().toISOString() })
+    .eq('id', restaurant.id)
+    .then(({ error: updateError }) => {
+      if (updateError) {
+        logError(`Failed to update last_featured_at for ${restaurant.name}`, updateError)
+      }
+    })
+
+  return restaurant
 }
 
 // ---------------------------------------------------------------------------
