@@ -1,0 +1,396 @@
+================================================================================
+                          EXPLOREHTX - SITE FEATURES
+                     Your Guide to Houston Events & Experiences
+================================================================================
+
+Last Updated: March 2026
+
+================================================================================
+                              TABLE OF CONTENTS
+================================================================================
+
+1. Events System
+2. Restaurants & Dining
+3. Things To Do (Attractions)
+4. Blog & Content
+5. Neighborhoods
+6. Newsletter & Email
+7. Search
+8. AI & Automation
+9. Technical Infrastructure
+
+================================================================================
+                            1. EVENTS SYSTEM
+================================================================================
+
+MAIN FEATURES:
+- Comprehensive Houston event discovery platform
+- Events sourced from multiple APIs and curated sources
+- Real-time event data with automatic updates
+
+EVENT CATEGORIES (12):
+- Music & Concerts
+- Arts & Theatre
+- Food & Drink
+- Sports
+- Family & Kids
+- Nightlife
+- Festivals
+- Comedy
+- Film & Cinema
+- Community
+- Outdoor & Recreation
+- Workshops & Classes
+
+TIME-BASED FILTERS:
+- /events              - All upcoming events
+- /events/today        - Events happening today
+- /events/this-weekend - Friday through Sunday events
+- /events/this-week    - Next 7 days
+- /events/this-month   - Current month events
+- /events/free         - Free events only
+
+EVENT DETAIL PAGES:
+- Full event description and details
+- Venue information with address
+- Date/time with timezone support (CST)
+- Ticket pricing (free indicator, price range)
+- "Add to Calendar" functionality
+- Schema.org Event structured data for SEO
+- Related events suggestions
+
+CATEGORY PAGES:
+- /events/category/[slug] - Filter by any category
+- Category-specific event listings
+- Category descriptions and metadata
+
+================================================================================
+                         2. RESTAURANTS & DINING
+================================================================================
+
+MAIN FEATURES:
+- Curated Houston restaurant discovery
+- Date night planning assistance
+- Cuisine and neighborhood filtering
+
+RESTAURANT DATA:
+- Name, description, cuisine type(s)
+- Neighborhood location
+- Price range ($, $$, $$$, $$$$)
+- Hours of operation (JSONB format)
+- Contact info (phone, website)
+- Reservation links
+- Features (outdoor seating, private dining, etc.)
+- Ambiance tags
+- Dietary accommodations
+
+PAGES:
+- /restaurants           - Main restaurant listing
+- /restaurants/[slug]    - Individual restaurant details
+- /restaurants/date-night - Date night restaurant guide
+
+DATE NIGHT FEATURES:
+- Romantic restaurant recommendations
+- Atmosphere and ambiance filtering
+- Price range considerations
+- Reservation assistance
+
+================================================================================
+                      3. THINGS TO DO (ATTRACTIONS)
+================================================================================
+
+MAIN FEATURES:
+- Houston attractions beyond ticketed events
+- Museums, parks, neighborhoods, free activities
+- Outdoor spots and local experiences
+
+ATTRACTION CATEGORIES (8):
+- Museums & Culture
+- Parks & Nature
+- Free Activities
+- Neighborhoods
+- Family Fun
+- Outdoor Adventures
+- Local Experiences
+- Sports & Recreation
+
+ATTRACTION DATA:
+- Name, description, short description
+- Location (address, neighborhood, coordinates)
+- Price type (free, paid, donation, varies)
+- Price range and notes
+- Hours of operation (JSONB)
+- Seasonal notes
+- Features array
+- Accessibility options
+- Best for (audience types)
+- Duration estimate (minutes)
+- Image gallery support
+
+PAGES:
+- /things-to-do              - Main listing by category
+- /things-to-do/[slug]       - Attraction detail page
+- /things-to-do/category/[slug] - Category filter
+- /things-to-do/free         - Free activities only
+
+SAMPLE ATTRACTIONS (15 seeded):
+- Space Center Houston
+- Museum of Fine Arts, Houston
+- Buffalo Bayou Park
+- Hermann Park
+- The Menil Collection
+- Houston Zoo
+- Discovery Green
+- The Heights (neighborhood)
+- Montrose (neighborhood)
+- Miller Outdoor Theatre
+- Houston Arboretum
+- Galveston Beach Day Trip
+- Memorial Park
+- Houston Mural Scene
+- Minute Maid Park Tours
+
+================================================================================
+                          4. BLOG & CONTENT
+================================================================================
+
+MAIN FEATURES:
+- AI-generated blog content
+- Multiple post types for variety
+- SEO-optimized articles
+- Houston-focused local content
+
+BLOG POST TYPES (8):
+1. Weekend Roundup       - Weekly event highlights (Friday AM)
+2. Neighborhood Guide    - District exploration guides (Saturday PM)
+3. Seasonal Guide        - Seasonal activity recommendations
+4. Event Spotlight       - Deep-dive on specific events (Sunday PM)
+5. Listicle              - "Top X" style lists (Monday AM)
+6. Restaurant Spotlight  - Restaurant features (Tuesday PM)
+7. Date Night Guide      - Romantic outing planning (Wednesday PM)
+8. Attraction Spotlight  - Things to do features (Thursday PM)
+
+BLOG DATA:
+- Title, excerpt, full content (Markdown + HTML)
+- Cover image with alt text
+- Author attribution
+- Post type categorization
+- Tags and keywords (SEO)
+- Meta title and description
+- Related event/restaurant/attraction IDs
+- Word count and reading time
+- AI generation metadata (model, prompt hash)
+- Publication status and date
+
+PAGES:
+- /blog           - Blog listing with all posts
+- /blog/[slug]    - Individual blog post
+
+FEATURES:
+- Schema.org Article structured data
+- Reading time estimates
+- Category badges with color coding
+- Related content linking
+- Social sharing optimization
+
+================================================================================
+                           5. NEIGHBORHOODS
+================================================================================
+
+MAIN FEATURES:
+- Houston neighborhood exploration guides
+- Local area information and highlights
+- Neighborhood-based event/restaurant filtering
+
+PAGES:
+- /neighborhoods        - All Houston neighborhoods
+- /neighborhoods/[slug] - Individual neighborhood guide
+
+NEIGHBORHOOD DATA:
+- Name and description
+- Geographic boundaries
+- Key attractions and landmarks
+- Local restaurants
+- Upcoming events in area
+- Vibe/character description
+
+================================================================================
+                        6. NEWSLETTER & EMAIL
+================================================================================
+
+SUBSCRIPTION SYSTEM:
+- Email newsletter signup
+- Double opt-in verification
+- Unsubscribe functionality
+
+PAGES:
+- /subscribe            - Newsletter signup form
+- /subscribe/verify     - Email verification
+- /subscribe/unsubscribe - Opt-out page
+
+API ENDPOINTS:
+- /api/subscribe        - Handle new subscriptions
+- /api/subscribe/verify - Verify email tokens
+- /api/subscribe/unsubscribe - Process unsubscribes
+
+EMAIL FEATURES:
+- Weekly digest emails (automated)
+- Event recommendations
+- New blog post notifications
+- Personalization options
+
+================================================================================
+                              7. SEARCH
+================================================================================
+
+MAIN FEATURES:
+- Site-wide search functionality
+- Search across events, restaurants, attractions
+- Real-time search suggestions
+
+PAGE:
+- /search - Search results page
+
+SEARCH CAPABILITIES:
+- Full-text search
+- Category filtering
+- Date range filtering
+- Price filtering
+- Location-based results
+
+================================================================================
+                         8. AI & AUTOMATION
+================================================================================
+
+AI BLOG GENERATION:
+- Model: GPT-4.1-nano (OpenAI)
+- Structured JSON responses
+- Markdown to HTML conversion
+- SEO keyword generation
+- Automatic tag creation
+- Reading time calculation
+- Prompt hash for duplicate detection
+
+GENERATION SCHEDULE:
+- Friday AM: Weekend Roundup
+- Saturday PM: Neighborhood Guide
+- Sunday PM: Event Spotlight
+- Monday AM: Listicle
+- Tuesday PM: Restaurant Spotlight
+- Wednesday PM: Date Night Guide
+- Thursday PM: Attraction Spotlight
+
+CRON JOBS (5):
+1. generate-blog.ts    - AI blog post generation (twice daily)
+2. ingest-events.ts    - Event data ingestion from APIs
+3. send-digest.ts      - Weekly email digest sending
+4. cleanup.ts          - Database cleanup and maintenance
+5. (Additional jobs as needed)
+
+================================================================================
+                      9. TECHNICAL INFRASTRUCTURE
+================================================================================
+
+FRAMEWORK & STACK:
+- Next.js 16 (App Router)
+- TypeScript (strict mode)
+- React 19
+- Tailwind CSS
+- Supabase (PostgreSQL database)
+- Vercel (hosting)
+- Render (cron job hosting)
+
+DATABASE:
+- Supabase PostgreSQL
+- Row Level Security (RLS) policies
+- Migrations-based schema management
+- JSONB for flexible data (hours, features)
+
+TABLES:
+- events
+- event_categories
+- restaurants
+- restaurant_categories
+- attractions
+- attraction_categories
+- blog_posts
+- neighborhoods
+- subscribers
+- (Additional supporting tables)
+
+SEO FEATURES:
+- Schema.org structured data (JSON-LD)
+  - Event
+  - Restaurant
+  - TouristAttraction
+  - Article
+  - BreadcrumbList
+- Dynamic meta tags
+- OpenGraph tags
+- Twitter Cards
+- Sitemap generation
+- robots.txt
+
+PERFORMANCE:
+- Server-side rendering (SSR)
+- Static generation where applicable
+- Image optimization (Next.js Image)
+- Lazy loading
+- Responsive design
+
+MONETIZATION:
+- Google AdSense integration
+- ads.txt configured
+
+UI COMPONENTS:
+- Lucide React icons
+- Custom card components
+- Grid layouts
+- Mobile-responsive navigation
+- Category badges with color coding
+
+================================================================================
+                              PAGES SUMMARY
+================================================================================
+
+PUBLIC PAGES (25+):
+├── /                           - Homepage
+├── /about                      - About ExploreHTX
+├── /search                     - Site search
+│
+├── /events                     - Events main
+│   ├── /events/[slug]          - Event detail
+│   ├── /events/category/[slug] - Category filter
+│   ├── /events/today           - Today's events
+│   ├── /events/this-weekend    - Weekend events
+│   ├── /events/this-week       - This week
+│   ├── /events/this-month      - This month
+│   └── /events/free            - Free events
+│
+├── /restaurants                - Restaurants main
+│   ├── /restaurants/[slug]     - Restaurant detail
+│   └── /restaurants/date-night - Date night guide
+│
+├── /things-to-do               - Attractions main
+│   ├── /things-to-do/[slug]    - Attraction detail
+│   ├── /things-to-do/category/[slug] - Category filter
+│   └── /things-to-do/free      - Free activities
+│
+├── /blog                       - Blog main
+│   └── /blog/[slug]            - Blog post
+│
+├── /neighborhoods              - Neighborhoods main
+│   └── /neighborhoods/[slug]   - Neighborhood detail
+│
+└── /subscribe                  - Newsletter
+    ├── /subscribe/verify       - Email verification
+    └── /subscribe/unsubscribe  - Unsubscribe
+
+API ROUTES (3):
+├── /api/subscribe
+├── /api/subscribe/verify
+└── /api/subscribe/unsubscribe
+
+================================================================================
+                               END OF DOCUMENT
+================================================================================
