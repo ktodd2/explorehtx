@@ -59,7 +59,7 @@ CREATE POLICY "Allow public insert on reviews"
 CREATE TRIGGER update_reviews_updated_at
   BEFORE UPDATE ON public.reviews
   FOR EACH ROW
-  EXECUTE FUNCTION public.update_updated_at_column();
+  EXECUTE FUNCTION set_updated_at();
 
 -- =============================================================================
 -- Helper function to get average rating for an entity

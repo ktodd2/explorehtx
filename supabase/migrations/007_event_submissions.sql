@@ -74,4 +74,4 @@ CREATE POLICY "Allow public insert on event_submissions"
 CREATE TRIGGER update_event_submissions_updated_at
   BEFORE UPDATE ON public.event_submissions
   FOR EACH ROW
-  EXECUTE FUNCTION public.update_updated_at_column();
+  EXECUTE FUNCTION set_updated_at();
