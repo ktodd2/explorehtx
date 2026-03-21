@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import BlogJsonLd from '@/components/blog/BlogJsonLd'
+import CopyForRedditButton from '@/components/blog/CopyForRedditButton'
 import EventCard from '@/components/events/EventCard'
 import BreadcrumbJsonLd from '@/components/seo/BreadcrumbJsonLd'
 import { truncate } from '@/lib/utils/format'
@@ -393,6 +394,12 @@ export default async function BlogPostPage({ params }: PageProps) {
                   <Share2 className="w-4 h-4" />
                   Copy Link
                 </button>
+                <CopyForRedditButton
+                  title={post.title}
+                  excerpt={post.excerpt}
+                  url={pageUrl}
+                  headings={toc.map((entry) => entry.text)}
+                />
               </div>
             </section>
           </article>
