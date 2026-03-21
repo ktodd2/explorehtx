@@ -137,6 +137,7 @@ export interface Event {
   start_date: string
   end_date: string | null
   is_all_day: boolean
+  venue_id: string | null
   venue_name: string | null
   venue_address: string | null
   venue_lat: number | null
@@ -246,6 +247,7 @@ export interface Restaurant {
   status: RestaurantStatus
   featured: boolean
   popularity_score: number
+  has_happy_hour: boolean
   created_at: string
   updated_at: string
 }
@@ -470,3 +472,112 @@ export type UpdateSubscriber = Partial<Omit<Subscriber, 'id'>>
 export type UpdateRestaurant = Partial<Omit<Restaurant, 'id'>>
 export type UpdateAttraction = Partial<Omit<Attraction, 'id'>>
 export type UpdateAttractionCategory = Partial<Omit<AttractionCategory, 'id'>>
+
+// =============================================================================
+// Happy Hour Types
+// =============================================================================
+
+export type DayOfWeek = 0 | 1 | 2 | 3 | 4 | 5 | 6 // Sunday = 0, Saturday = 6
+
+/**
+ * A single deal in a happy hour
+ */
+export interface HappyHourDeal {
+  type: 'drink' | 'food' | 'other'
+  description: string
+  original_price?: string
+}
+
+/**
+ * Represents a row in the `happy_hours` table.
+ */
+export interface HappyHour {
+  id: string
+  restaurant_id: string
+  day_of_week: DayOfWeek
+  start_time: string // "16:00"
+  end_time: string   // "19:00"
+  deals: HappyHourDeal[]
+  notes: string | null
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+/**
+ * Happy hour with joined restaurant data
+ */
+export interface HappyHourWithRestaurant extends HappyHour {
+  restaurant: Restaurant
+}
+
+/**
+ * Payload for creating a new happy hour
+ */
+export type InsertHappyHour = Omit<HappyHour, 'id' | 'created_at' | 'updated_at'> &
+  Partial<Pick<HappyHour, 'id' | 'created_at' | 'updated_at'>>
+
+export type UpdateHappyHour = Partial<Omit<HappyHour, 'id'>>
+
+// =============================================================================
+// Venue Types
+// =============================================================================
+
+export type VenueStatus = 'active' | 'archived' | 'coming_soon'
+
+/**
+ * Represents a row in the `venues` table.
+ */
+export interface Venue {
+  id: string
+  name: string
+  slug: string
+  description: string | null
+  short_description: string | null
+
+  // Location
+  address: string | null
+  neighborhood: string | null
+  lat: number | null
+  lng: number | null
+
+  // Contact & links
+  phone: string | null
+  website_url: string | null
+  booking_url: string | null
+
+  // Venue type and capacity
+  venue_type: string | null
+  capacity: number | null
+
+  // Features
+  features: string[]
+  amenities: string[]
+
+  // Media
+  image_url: string | null
+  image_alt: string | null
+  gallery_urls: string[]
+
+  // Metadata
+  status: VenueStatus
+  featured: boolean
+  popularity_score: number
+  created_at: string
+  updated_at: string
+}
+
+/**
+ * Venue with upcoming events count
+ */
+export interface VenueWithEventCount extends Venue {
+  upcoming_events_count: number
+}
+
+/**
+ * Payload for creating a new venue
+ */
+export type InsertVenue = Omit<Venue, 'id' | 'created_at' | 'updated_at'> &
+  Partial<Pick<Venue, 'id' | 'created_at' | 'updated_at'>>
+
+export type UpdateVenue = Partial<Omit<Venue, 'id'>>

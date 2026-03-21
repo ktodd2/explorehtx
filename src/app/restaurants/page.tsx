@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Utensils, Heart, HelpCircle } from 'lucide-react';
+import { Utensils, Heart, HelpCircle, Coffee } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import RestaurantGrid from '@/components/restaurants/RestaurantGrid';
 import BreadcrumbJsonLd from '@/components/seo/BreadcrumbJsonLd';
@@ -140,7 +140,14 @@ export default async function RestaurantsPage() {
               <Heart className="w-4 h-4" />
               Date Night Guide
             </Link>
-            {cuisineGroups.slice(0, 4).map(({ cuisineType }) => (
+            <Link
+              href="/restaurants/brunch"
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-amber-500 hover:bg-amber-400 text-white font-semibold text-sm rounded-xl transition-colors shadow-md"
+            >
+              <Coffee className="w-4 h-4" />
+              Brunch Spots
+            </Link>
+            {cuisineGroups.slice(0, 3).map(({ cuisineType }) => (
               <a
                 key={cuisineType}
                 href={`#${cuisineType.toLowerCase().replace(/\s+/g, '-')}`}

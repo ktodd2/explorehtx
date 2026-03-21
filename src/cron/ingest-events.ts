@@ -135,6 +135,7 @@ function toInsertEvent(event: NormalizedEvent, category: string, neighborhood: s
     start_date:     event.startDate,
     end_date:       event.endDate ?? null,
     is_all_day:     event.isAllDay ?? false,
+    venue_id:       null,
     venue_name:     event.venueName ?? null,
     venue_address:  event.venueAddress ?? null,
     venue_lat:      event.lat ?? null,

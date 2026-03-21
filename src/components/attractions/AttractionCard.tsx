@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { MapPin, Clock, DollarSign, Gift, Landmark } from 'lucide-react';
 import type { Attraction, AttractionCategory } from '@/types/database';
+import OpenNowBadge from '@/components/filters/OpenNowBadge';
 
 interface AttractionCardProps {
   attraction: Attraction;
@@ -121,13 +122,16 @@ export default function AttractionCard({ attraction, category }: AttractionCardP
 
         {/* Meta row */}
         <div className="mt-auto pt-4 space-y-1.5">
-          {/* Neighborhood */}
-          {attraction.neighborhood && (
-            <div className="flex items-center gap-1.5 text-sm text-gray-600">
-              <MapPin className="w-3.5 h-3.5 text-sunset-orange-500 flex-shrink-0" />
-              <span className="truncate">{attraction.neighborhood}</span>
-            </div>
-          )}
+          {/* Open status + Neighborhood */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <OpenNowBadge hours={attraction.hours} type="attraction" />
+            {attraction.neighborhood && (
+              <div className="flex items-center gap-1.5 text-sm text-gray-600">
+                <MapPin className="w-3.5 h-3.5 text-sunset-orange-500 flex-shrink-0" />
+                <span className="truncate">{attraction.neighborhood}</span>
+              </div>
+            )}
+          </div>
 
           {/* Duration & CTA */}
           <div className="flex items-center justify-between pt-1">

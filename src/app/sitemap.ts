@@ -102,6 +102,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
     },
     {
+      url: `${BASE_URL}/restaurants/brunch`,
+      changeFrequency: 'weekly' as ChangeFrequency,
+      priority: 0.8,
+      lastModified: new Date(),
+    },
+    {
+      url: `${BASE_URL}/happy-hour`,
+      changeFrequency: 'daily' as ChangeFrequency,
+      priority: 0.85,
+      lastModified: new Date(),
+    },
+    {
+      url: `${BASE_URL}/happy-hour/today`,
+      changeFrequency: 'hourly' as ChangeFrequency,
+      priority: 0.8,
+      lastModified: new Date(),
+    },
+    {
+      url: `${BASE_URL}/venues`,
+      changeFrequency: 'weekly' as ChangeFrequency,
+      priority: 0.8,
+      lastModified: new Date(),
+    },
+    {
       url: `${BASE_URL}/things-to-do`,
       changeFrequency: 'weekly' as ChangeFrequency,
       priority: 0.85,
@@ -227,6 +251,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: new Date(),
   }));
 
+  // ── Dynamic: active venues ─────────────────────────────────────────────────
+  const { data: venues } = await supabase
+    .from('venues')
+    .select('slug, updated_at')
+    .eq('status', 'active');
+
+  const venuePages: MetadataRoute.Sitemap = (venues ?? []).map((v) => ({
+    url: `${BASE_URL}/venues/${v.slug}`,
+    changeFrequency: 'weekly' as ChangeFrequency,
+    priority: 0.7,
+    lastModified: new Date(v.updated_at),
+  }));
+
   return [
     ...staticPages,
     ...eventPages,
@@ -236,5 +273,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...restaurantPages,
     ...attractionPages,
     ...attractionCategoryPages,
+    ...venuePages,
   ];
 }

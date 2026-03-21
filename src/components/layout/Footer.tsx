@@ -6,6 +6,7 @@ const quickLinks = [
   { href: '/saved', label: 'Saved Events' },
   { href: '/restaurants', label: 'Restaurants' },
   { href: '/things-to-do', label: 'Things To Do' },
+  { href: '/venues', label: 'Venues' },
   { href: '/blog', label: 'Blog & Stories' },
   { href: '/neighborhoods', label: 'Neighborhoods' },
 ];
@@ -16,7 +17,9 @@ const eventFilters = [
   { href: '/events/this-week', label: 'This Week' },
   { href: '/events/free', label: 'Free Events' },
   { href: '/events/live-music', label: 'Live Music' },
-  { href: '/restaurants/date-night', label: 'Date Night Restaurants' },
+  { href: '/restaurants/date-night', label: 'Date Night' },
+  { href: '/restaurants/brunch', label: 'Brunch Spots' },
+  { href: '/happy-hour', label: 'Happy Hour Guide' },
 ];
 
 const categories = [

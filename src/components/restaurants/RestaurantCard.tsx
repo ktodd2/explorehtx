@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { MapPin, DollarSign, Utensils, Heart } from 'lucide-react';
 import type { Restaurant } from '@/types/database';
+import OpenNowBadge from '@/components/filters/OpenNowBadge';
 
 interface RestaurantCardProps {
   restaurant: Restaurant;
@@ -105,13 +106,16 @@ export default function RestaurantCard({ restaurant }: RestaurantCardProps) {
 
         {/* Meta row */}
         <div className="mt-auto pt-4 space-y-1.5">
-          {/* Neighborhood */}
-          {restaurant.neighborhood && (
-            <div className="flex items-center gap-1.5 text-sm text-gray-600">
-              <MapPin className="w-3.5 h-3.5 text-sunset-orange-500 flex-shrink-0" />
-              <span className="truncate">{restaurant.neighborhood}</span>
-            </div>
-          )}
+          {/* Open status + Neighborhood */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <OpenNowBadge hours={restaurant.hours} type="restaurant" />
+            {restaurant.neighborhood && (
+              <div className="flex items-center gap-1.5 text-sm text-gray-600">
+                <MapPin className="w-3.5 h-3.5 text-sunset-orange-500 flex-shrink-0" />
+                <span className="truncate">{restaurant.neighborhood}</span>
+              </div>
+            )}
+          </div>
 
           {/* Price & Signature Dish */}
           <div className="flex items-center justify-between pt-1">
