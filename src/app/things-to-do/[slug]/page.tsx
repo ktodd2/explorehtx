@@ -19,6 +19,7 @@ import {
 import { createClient } from '@/lib/supabase/server';
 import AttractionJsonLd from '@/components/attractions/AttractionJsonLd';
 import BreadcrumbJsonLd from '@/components/seo/BreadcrumbJsonLd';
+import ReviewsSection from '@/components/reviews/ReviewsSection';
 import type { Attraction, AttractionCategory } from '@/types/database';
 
 interface PageProps {
@@ -488,6 +489,13 @@ export default async function AttractionDetailPage({ params }: PageProps) {
             )}
           </div>
         </div>
+
+        {/* Reviews */}
+        <ReviewsSection
+          entityType="attraction"
+          entityId={attraction.id}
+          entityName={attraction.name}
+        />
       </div>
     </>
   );

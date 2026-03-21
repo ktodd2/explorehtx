@@ -17,6 +17,7 @@ import {
 import { createClient } from '@/lib/supabase/server';
 import RestaurantJsonLd from '@/components/restaurants/RestaurantJsonLd';
 import BreadcrumbJsonLd from '@/components/seo/BreadcrumbJsonLd';
+import ReviewsSection from '@/components/reviews/ReviewsSection';
 import type { Restaurant } from '@/types/database';
 
 interface PageProps {
@@ -457,6 +458,13 @@ export default async function RestaurantDetailPage({ params }: PageProps) {
             )}
           </div>
         </div>
+
+        {/* Reviews */}
+        <ReviewsSection
+          entityType="restaurant"
+          entityId={restaurant.id}
+          entityName={restaurant.name}
+        />
       </div>
     </>
   );

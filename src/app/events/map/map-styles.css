@@ -1,0 +1,50 @@
+/* Custom marker styles */
+.custom-marker {
+  background: transparent;
+  border: none;
+}
+
+/* Popup styling */
+.leaflet-popup-content-wrapper {
+  border-radius: 12px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.leaflet-popup-content {
+  margin: 12px;
+  min-width: 200px;
+}
+
+.leaflet-popup-tip {
+  background: white;
+}
+
+/* Zoom controls */
+.leaflet-control-zoom {
+  border: none !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+.leaflet-control-zoom a {
+  border-radius: 8px !important;
+  width: 32px !important;
+  height: 32px !important;
+  line-height: 32px !important;
+}
+
+.leaflet-control-zoom-in {
+  border-radius: 8px 8px 0 0 !important;
+}
+
+.leaflet-control-zoom-out {
+  border-radius: 0 0 8px 8px !important;
+}
+
+/* Attribution */
+.leaflet-control-attribution {
+  background: rgba(255, 255, 255, 0.8) !important;
+  padding: 2px 8px !important;
+  border-radius: 4px !important;
+  font-size: 10px !important;
+}

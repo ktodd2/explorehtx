@@ -581,3 +581,101 @@ export type InsertVenue = Omit<Venue, 'id' | 'created_at' | 'updated_at'> &
   Partial<Pick<Venue, 'id' | 'created_at' | 'updated_at'>>
 
 export type UpdateVenue = Partial<Omit<Venue, 'id'>>
+
+// =============================================================================
+// Review Types
+// =============================================================================
+
+export type ReviewEntityType = 'restaurant' | 'attraction'
+
+export type ReviewStatus = 'pending' | 'approved' | 'rejected'
+
+/**
+ * Represents a row in the `reviews` table.
+ */
+export interface Review {
+  id: string
+  entity_type: ReviewEntityType
+  entity_id: string
+  rating: number // 1-5
+  title: string | null
+  content: string
+  reviewer_name: string
+  reviewer_email: string
+  is_verified: boolean
+  verification_token: string | null
+  status: ReviewStatus
+  moderation_note: string | null
+  moderated_at: string | null
+  helpful_count: number
+  created_at: string
+  updated_at: string
+}
+
+/**
+ * Aggregated rating for an entity
+ */
+export interface EntityRating {
+  average_rating: number
+  review_count: number
+}
+
+/**
+ * Payload for creating a new review
+ */
+export type InsertReview = Omit<
+  Review,
+  'id' | 'is_verified' | 'verification_token' | 'status' | 'moderation_note' | 'moderated_at' | 'helpful_count' | 'created_at' | 'updated_at'
+> & Partial<Pick<Review, 'id' | 'status' | 'created_at' | 'updated_at'>>
+
+export type UpdateReview = Partial<Omit<Review, 'id'>>
+
+// =============================================================================
+// Event Submission Types
+// =============================================================================
+
+export type EventSubmissionStatus = 'pending' | 'approved' | 'rejected'
+
+/**
+ * Represents a row in the `event_submissions` table.
+ */
+export interface EventSubmission {
+  id: string
+  title: string
+  description: string | null
+  start_date: string
+  end_date: string | null
+  is_all_day: boolean
+  venue_name: string | null
+  venue_address: string | null
+  category: string
+  tags: string[]
+  image_url: string | null
+  price_min: number | null
+  price_max: number | null
+  is_free: boolean
+  ticket_url: string | null
+  organizer_name: string | null
+  organizer_email: string
+  organizer_phone: string | null
+  organizer_website: string | null
+  status: EventSubmissionStatus
+  moderation_note: string | null
+  moderated_at: string | null
+  moderated_by: string | null
+  approved_event_id: string | null
+  ip_address: string | null
+  user_agent: string | null
+  submitted_at: string
+  updated_at: string
+}
+
+/**
+ * Payload for creating a new event submission
+ */
+export type InsertEventSubmission = Omit<
+  EventSubmission,
+  'id' | 'status' | 'moderation_note' | 'moderated_at' | 'moderated_by' | 'approved_event_id' | 'submitted_at' | 'updated_at'
+> & Partial<Pick<EventSubmission, 'id' | 'status' | 'submitted_at' | 'updated_at'>>
+
+export type UpdateEventSubmission = Partial<Omit<EventSubmission, 'id'>>

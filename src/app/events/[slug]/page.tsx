@@ -20,6 +20,7 @@ import EventJsonLd from '@/components/events/EventJsonLd';
 import EventCard from '@/components/events/EventCard';
 import AddToCalendarButton from '@/components/events/AddToCalendarButton';
 import SaveEventButton from '@/components/events/SaveEventButton';
+import EmbedCodeGenerator from '@/components/events/EmbedCodeGenerator';
 import BreadcrumbJsonLd from '@/components/seo/BreadcrumbJsonLd';
 import { formatDateRange, formatEventDate } from '@/lib/utils/dates';
 import { formatPrice, categoryDisplayName, truncate } from '@/lib/utils/format';
@@ -507,6 +508,9 @@ export default async function EventDetailPage({ params }: PageProps) {
                 </a>
               )}
             </div>
+
+            {/* Embed generator */}
+            <EmbedCodeGenerator eventSlug={event.slug} eventTitle={event.title} />
 
             {/* Back link */}
             <Link

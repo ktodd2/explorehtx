@@ -72,6 +72,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
     },
     {
+      url: `${BASE_URL}/events/map`,
+      changeFrequency: 'hourly' as ChangeFrequency,
+      priority: 0.85,
+      lastModified: new Date(),
+    },
+    {
       url: `${BASE_URL}/saved`,
       changeFrequency: 'monthly' as ChangeFrequency,
       priority: 0.4,
@@ -147,6 +153,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${BASE_URL}/about`,
       changeFrequency: 'monthly' as ChangeFrequency,
       priority: 0.5,
+      lastModified: new Date(),
+    },
+    {
+      url: `${BASE_URL}/submit-event`,
+      changeFrequency: 'monthly' as ChangeFrequency,
+      priority: 0.6,
+      lastModified: new Date(),
+    },
+    {
+      url: `${BASE_URL}/planner`,
+      changeFrequency: 'monthly' as ChangeFrequency,
+      priority: 0.7,
       lastModified: new Date(),
     },
   ];

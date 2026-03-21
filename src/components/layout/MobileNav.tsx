@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Menu, X, MapPin, Calendar, Newspaper, Compass, Info, Utensils, Heart, Music, Clock, Building2 } from 'lucide-react';
+import { Menu, X, MapPin, Calendar, Newspaper, Compass, Info, Utensils, Heart, Music, Clock, Building2, CalendarDays } from 'lucide-react';
 
 const navLinks = [
   { href: '/events', label: 'Events', icon: Calendar },
@@ -14,6 +14,7 @@ const navLinks = [
   { href: '/blog', label: 'Blog', icon: Newspaper },
   { href: '/neighborhoods', label: 'Neighborhoods', icon: MapPin },
   { href: '/things-to-do', label: 'Things To Do', icon: Compass },
+  { href: '/planner', label: 'Weekend Planner', icon: CalendarDays },
   { href: '/about', label: 'About', icon: Info },
 ];
 

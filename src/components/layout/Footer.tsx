@@ -8,7 +8,7 @@ const quickLinks = [
   { href: '/things-to-do', label: 'Things To Do' },
   { href: '/venues', label: 'Venues' },
   { href: '/blog', label: 'Blog & Stories' },
-  { href: '/neighborhoods', label: 'Neighborhoods' },
+  { href: '/submit-event', label: 'Submit Event' },
 ];
 
 const eventFilters = [

@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Calendar, ChevronLeft, ChevronRight, HelpCircle } from 'lucide-react';
+import { Calendar, ChevronLeft, ChevronRight, HelpCircle, Map, List } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import EventGrid from '@/components/events/EventGrid';
 import EventFilters from '@/components/events/EventFilters';
@@ -231,7 +231,7 @@ export default async function EventsPage({ searchParams }: PageProps) {
           />
         </Suspense>
 
-        {/* Results count */}
+        {/* Results count and view toggle */}
         <div className="mt-6 mb-4 flex items-center justify-between">
           <p className="text-sm text-gray-500">
             {hasFilters ? (
@@ -248,11 +248,27 @@ export default async function EventsPage({ searchParams }: PageProps) {
             )}
           </p>
 
-          {total > PAGE_SIZE && (
-            <p className="text-sm text-gray-400">
-              Page {page} of {totalPages}
-            </p>
-          )}
+          <div className="flex items-center gap-3">
+            {total > PAGE_SIZE && (
+              <p className="text-sm text-gray-400">
+                Page {page} of {totalPages}
+              </p>
+            )}
+            {/* View toggle */}
+            <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+              <span className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-space-blue-900 rounded-md">
+                <List className="w-4 h-4" />
+                List
+              </span>
+              <Link
+                href="/events/map"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 rounded-md transition-colors"
+              >
+                <Map className="w-4 h-4" />
+                Map
+              </Link>
+            </div>
+          </div>
         </div>
 
         {/* Grid */}
