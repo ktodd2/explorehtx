@@ -9,10 +9,12 @@ import {
   Mountain,
   Star,
   Dumbbell,
+  HelpCircle,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import AttractionGrid from '@/components/attractions/AttractionGrid';
 import BreadcrumbJsonLd from '@/components/seo/BreadcrumbJsonLd';
+import FAQJsonLd from '@/components/seo/FAQJsonLd';
 import type { Attraction, AttractionCategory } from '@/types/database';
 
 export const metadata: Metadata = {
@@ -30,6 +32,24 @@ export const metadata: Metadata = {
     type: 'website',
   },
 };
+
+const THINGS_TO_DO_FAQ = [
+  {
+    question: 'What are free things to do in Houston?',
+    answer:
+      'Houston offers many free activities including the Houston Museum District free days, Hermann Park, Buffalo Bayou Park trails, Discovery Green, and the Menil Collection. Check our Free Activities section for a complete list of no-cost attractions.',
+  },
+  {
+    question: 'What are the best Houston museums?',
+    answer:
+      'Houston is home to world-class museums including the Museum of Fine Arts Houston, the Houston Museum of Natural Science, Space Center Houston, the Children\'s Museum of Houston, and the Contemporary Arts Museum Houston. Many offer free admission days.',
+  },
+  {
+    question: 'What outdoor activities are in Houston?',
+    answer:
+      'Houston has extensive green spaces including Hermann Park, Memorial Park, Buffalo Bayou Park, and the Houston Arboretum. Popular outdoor activities include hiking, biking, kayaking on Buffalo Bayou, and visiting the Houston Zoo.',
+  },
+];
 
 /** Map category slugs to Lucide icons */
 const CATEGORY_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -148,6 +168,7 @@ export default async function ThingsToDoPage() {
           { name: 'Things To Do', href: '/things-to-do' },
         ]}
       />
+      <FAQJsonLd items={THINGS_TO_DO_FAQ} />
 
       {/* Page header */}
       <section className="bg-space-blue-900 py-12 sm:py-16">
@@ -260,6 +281,26 @@ export default async function ThingsToDoPage() {
             </p>
           </div>
         )}
+
+        {/* FAQ Section */}
+        <section className="mt-16 border-t border-gray-200 pt-12">
+          <div className="flex items-center gap-2 mb-6">
+            <HelpCircle className="w-5 h-5 text-sunset-orange-500" />
+            <h2 className="text-2xl font-bold text-gray-900">
+              Frequently Asked Questions
+            </h2>
+          </div>
+          <div className="space-y-6">
+            {THINGS_TO_DO_FAQ.map((faq, index) => (
+              <div key={index} className="bg-gray-50 rounded-xl p-6">
+                <h3 className="font-semibold text-gray-900 mb-2">
+                  {faq.question}
+                </h3>
+                <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
+              </div>
+            ))}
+          </div>
+        </section>
       </div>
     </>
   );

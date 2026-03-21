@@ -72,6 +72,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
     },
     {
+      url: `${BASE_URL}/restaurants`,
+      changeFrequency: 'weekly' as ChangeFrequency,
+      priority: 0.85,
+      lastModified: new Date(),
+    },
+    {
+      url: `${BASE_URL}/restaurants/date-night`,
+      changeFrequency: 'weekly' as ChangeFrequency,
+      priority: 0.8,
+      lastModified: new Date(),
+    },
+    {
+      url: `${BASE_URL}/things-to-do`,
+      changeFrequency: 'weekly' as ChangeFrequency,
+      priority: 0.85,
+      lastModified: new Date(),
+    },
+    {
+      url: `${BASE_URL}/things-to-do/free`,
+      changeFrequency: 'weekly' as ChangeFrequency,
+      priority: 0.8,
+      lastModified: new Date(),
+    },
+    {
       url: `${BASE_URL}/subscribe`,
       changeFrequency: 'monthly' as ChangeFrequency,
       priority: 0.6,
@@ -141,11 +165,58 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
   );
 
+  // ── Dynamic: active restaurants ─────────────────────────────────────────
+  const { data: restaurants } = await supabase
+    .from('restaurants')
+    .select('slug, updated_at')
+    .eq('status', 'active');
+
+  const restaurantPages: MetadataRoute.Sitemap = (restaurants ?? []).map(
+    (r) => ({
+      url: `${BASE_URL}/restaurants/${r.slug}`,
+      changeFrequency: 'weekly' as ChangeFrequency,
+      priority: 0.7,
+      lastModified: new Date(r.updated_at),
+    })
+  );
+
+  // ── Dynamic: active attractions ─────────────────────────────────────────
+  const { data: attractions } = await supabase
+    .from('attractions')
+    .select('slug, updated_at')
+    .eq('status', 'active');
+
+  const attractionPages: MetadataRoute.Sitemap = (attractions ?? []).map(
+    (a) => ({
+      url: `${BASE_URL}/things-to-do/${a.slug}`,
+      changeFrequency: 'weekly' as ChangeFrequency,
+      priority: 0.7,
+      lastModified: new Date(a.updated_at),
+    })
+  );
+
+  // ── Dynamic: attraction categories ───────────────────────────────────────
+  const { data: attractionCategories } = await supabase
+    .from('attraction_categories')
+    .select('slug');
+
+  const attractionCategoryPages: MetadataRoute.Sitemap = (
+    attractionCategories ?? []
+  ).map((cat) => ({
+    url: `${BASE_URL}/things-to-do/category/${cat.slug}`,
+    changeFrequency: 'weekly' as ChangeFrequency,
+    priority: 0.75,
+    lastModified: new Date(),
+  }));
+
   return [
     ...staticPages,
     ...eventPages,
     ...blogPages,
     ...categoryPages,
     ...neighborhoodPages,
+    ...restaurantPages,
+    ...attractionPages,
+    ...attractionCategoryPages,
   ];
 }

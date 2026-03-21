@@ -1,11 +1,12 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar, ChevronLeft, ChevronRight, HelpCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import EventGrid from '@/components/events/EventGrid';
 import EventFilters from '@/components/events/EventFilters';
 import BreadcrumbJsonLd from '@/components/seo/BreadcrumbJsonLd';
+import FAQJsonLd from '@/components/seo/FAQJsonLd';
 import {
   getToday,
   getThisWeek,
@@ -143,6 +144,24 @@ async function fetchFilterOptions(): Promise<{
   return { categories, neighborhoods };
 }
 
+const EVENT_FAQ = [
+  {
+    question: 'What events are happening in Houston this weekend?',
+    answer:
+      'ExploreHTX lists hundreds of Houston events every weekend including concerts, festivals, food events, sports, and family activities. Use our "This Weekend" filter to see all upcoming weekend events, or browse by category to find exactly what you\'re looking for.',
+  },
+  {
+    question: 'Where can I find free events in Houston?',
+    answer:
+      'Houston has many free events each week. Use our "Free Events" filter to find concerts in the park, museum free days, community festivals, outdoor markets, and more. We update our free events list daily.',
+  },
+  {
+    question: 'How do I find family-friendly Houston events?',
+    answer:
+      'Browse our Family & Kids category to find events suitable for all ages. From children\'s museums and zoo activities to outdoor festivals and educational workshops, we curate family-friendly options across Houston.',
+  },
+];
+
 export default async function EventsPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const page = Math.max(1, parseInt(params.page ?? '1', 10));
@@ -181,6 +200,7 @@ export default async function EventsPage({ searchParams }: PageProps) {
           { name: 'Events', href: '/events' },
         ]}
       />
+      <FAQJsonLd items={EVENT_FAQ} />
 
       {/* Page header */}
       <section className="bg-space-blue-900 py-12 sm:py-16">
@@ -311,6 +331,26 @@ export default async function EventsPage({ searchParams }: PageProps) {
             )}
           </nav>
         )}
+
+        {/* FAQ Section */}
+        <section className="mt-16 border-t border-gray-200 pt-12">
+          <div className="flex items-center gap-2 mb-6">
+            <HelpCircle className="w-5 h-5 text-sunset-orange-500" />
+            <h2 className="text-2xl font-bold text-gray-900">
+              Frequently Asked Questions
+            </h2>
+          </div>
+          <div className="space-y-6">
+            {EVENT_FAQ.map((faq, index) => (
+              <div key={index} className="bg-gray-50 rounded-xl p-6">
+                <h3 className="font-semibold text-gray-900 mb-2">
+                  {faq.question}
+                </h3>
+                <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
+              </div>
+            ))}
+          </div>
+        </section>
       </div>
     </>
   );

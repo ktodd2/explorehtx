@@ -3,20 +3,29 @@ import { MapPin, Mail, Instagram, Twitter, Facebook, Youtube, Heart } from 'luci
 
 const quickLinks = [
   { href: '/events', label: 'Upcoming Events' },
+  { href: '/restaurants', label: 'Restaurants' },
+  { href: '/things-to-do', label: 'Things To Do' },
   { href: '/blog', label: 'Blog & Stories' },
   { href: '/neighborhoods', label: 'Neighborhoods' },
-  { href: '/things-to-do', label: 'Things To Do' },
   { href: '/about', label: 'About Us' },
-  { href: '/contact', label: 'Contact' },
+];
+
+const eventFilters = [
+  { href: '/events/today', label: 'Events Today' },
+  { href: '/events/this-weekend', label: 'This Weekend' },
+  { href: '/events/this-week', label: 'This Week' },
+  { href: '/events/free', label: 'Free Events' },
+  { href: '/restaurants/date-night', label: 'Date Night Restaurants' },
+  { href: '/things-to-do/free', label: 'Free Things To Do' },
 ];
 
 const categories = [
-  { href: '/events?category=concerts', label: 'Concerts & Music' },
-  { href: '/events?category=food', label: 'Food & Dining' },
-  { href: '/events?category=nightlife', label: 'Nightlife' },
-  { href: '/events?category=arts', label: 'Arts & Culture' },
-  { href: '/events?category=sports', label: 'Sports & Recreation' },
-  { href: '/events?category=family', label: 'Family & Kids' },
+  { href: '/events/category/music-concerts', label: 'Concerts & Music' },
+  { href: '/events/category/food-dining', label: 'Food & Dining' },
+  { href: '/events/category/nightlife', label: 'Nightlife' },
+  { href: '/events/category/arts-culture', label: 'Arts & Culture' },
+  { href: '/events/category/sports', label: 'Sports & Recreation' },
+  { href: '/events/category/family-kids', label: 'Family & Kids' },
 ];
 
 const socialLinks = [
@@ -32,7 +41,7 @@ export default function Footer() {
 
       {/* Main footer grid */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-14">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10">
 
           {/* About column */}
           <div className="sm:col-span-2 lg:col-span-1">
@@ -68,10 +77,29 @@ export default function Footer() {
           {/* Quick Links */}
           <div>
             <h3 className="font-bold text-sm uppercase tracking-widest text-sunset-orange-400 mb-4">
-              Quick Links
+              Explore
             </h3>
             <ul className="space-y-2.5">
               {quickLinks.map(({ href, label }) => (
+                <li key={href}>
+                  <Link
+                    href={href}
+                    className="text-gray-300 hover:text-white text-sm transition-colors hover:underline underline-offset-2"
+                  >
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Find Events */}
+          <div>
+            <h3 className="font-bold text-sm uppercase tracking-widest text-sunset-orange-400 mb-4">
+              Find Events
+            </h3>
+            <ul className="space-y-2.5">
+              {eventFilters.map(({ href, label }) => (
                 <li key={href}>
                   <Link
                     href={href}
@@ -109,7 +137,7 @@ export default function Footer() {
               Stay in the Loop
             </h3>
             <p className="text-gray-300 text-sm leading-relaxed mb-4">
-              Get the best Houston events and things to do delivered to your inbox every week.
+              Get the best Houston events delivered weekly.
             </p>
             <form
               action="/subscribe"
@@ -134,7 +162,7 @@ export default function Footer() {
                 type="submit"
                 className="w-full py-2.5 px-4 rounded-xl bg-sunset-orange-500 hover:bg-sunset-orange-400 text-white font-semibold text-sm transition-colors shadow-md"
               >
-                Subscribe — It&apos;s Free
+                Subscribe Free
               </button>
             </form>
           </div>

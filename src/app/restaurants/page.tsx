@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Utensils, Heart } from 'lucide-react';
+import { Utensils, Heart, HelpCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import RestaurantGrid from '@/components/restaurants/RestaurantGrid';
 import BreadcrumbJsonLd from '@/components/seo/BreadcrumbJsonLd';
+import FAQJsonLd from '@/components/seo/FAQJsonLd';
 import type { Restaurant } from '@/types/database';
 
 export const metadata: Metadata = {
@@ -21,6 +22,19 @@ export const metadata: Metadata = {
     type: 'website',
   },
 };
+
+const RESTAURANT_FAQ = [
+  {
+    question: 'What are the best date night restaurants in Houston?',
+    answer:
+      'Houston offers exceptional date night options including romantic Italian bistros, upscale steakhouses, intimate French restaurants, and rooftop dining with skyline views. Check our Date Night Guide for curated romantic restaurant recommendations organized by cuisine and occasion.',
+  },
+  {
+    question: 'Where are the best restaurants in Houston?',
+    answer:
+      'Houston is one of America\'s best food cities with world-class dining across every cuisine. Top neighborhoods for restaurants include Montrose, the Heights, Rice Village, Downtown, and the Museum District. Our restaurant guide features curated picks from local food experts.',
+  },
+];
 
 interface RestaurantsByCuisine {
   cuisineType: string;
@@ -98,6 +112,7 @@ export default async function RestaurantsPage() {
           { name: 'Restaurants', href: '/restaurants' },
         ]}
       />
+      <FAQJsonLd items={RESTAURANT_FAQ} />
 
       {/* Page header */}
       <section className="bg-space-blue-900 py-12 sm:py-16">
@@ -186,6 +201,26 @@ export default async function RestaurantsPage() {
             </p>
           </div>
         )}
+
+        {/* FAQ Section */}
+        <section className="mt-16 border-t border-gray-200 pt-12">
+          <div className="flex items-center gap-2 mb-6">
+            <HelpCircle className="w-5 h-5 text-sunset-orange-500" />
+            <h2 className="text-2xl font-bold text-gray-900">
+              Frequently Asked Questions
+            </h2>
+          </div>
+          <div className="space-y-6">
+            {RESTAURANT_FAQ.map((faq, index) => (
+              <div key={index} className="bg-gray-50 rounded-xl p-6">
+                <h3 className="font-semibold text-gray-900 mb-2">
+                  {faq.question}
+                </h3>
+                <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
+              </div>
+            ))}
+          </div>
+        </section>
       </div>
     </>
   );
