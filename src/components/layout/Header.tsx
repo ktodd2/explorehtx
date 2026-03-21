@@ -4,6 +4,7 @@ import MobileNav from './MobileNav';
 
 const navLinks = [
   { href: '/events', label: 'Events' },
+  { href: '/restaurants', label: 'Restaurants' },
   { href: '/blog', label: 'Blog' },
   { href: '/neighborhoods', label: 'Neighborhoods' },
   { href: '/things-to-do', label: 'Things To Do' },

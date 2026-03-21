@@ -27,7 +27,8 @@ import {
   HOUSTON_NEIGHBORHOODS,
 }                                       from '../lib/openai/prompts/neighborhood-guide'
 import { buildListiclePrompt }          from '../lib/openai/prompts/listicle'
-import type { Event, InsertBlogPost }   from '../types/database'
+import { buildDateNightGuidePrompt }    from '../lib/openai/prompts/date-night-guide'
+import type { Event, InsertBlogPost, Restaurant } from '../types/database'
 import type { ListicleType }            from '../lib/openai/prompts/listicle'
 
 // ---------------------------------------------------------------------------
@@ -237,6 +238,54 @@ async function fetchFreeEvents(
 }
 
 // ---------------------------------------------------------------------------
+// Restaurant fetch helpers
+// ---------------------------------------------------------------------------
+
+async function fetchDateNightRestaurants(
+  supabase: ReturnType<typeof createAdminClient>,
+  limit = 10
+): Promise<Restaurant[]> {
+  const { data, error } = await supabase
+    .from('restaurants')
+    .select('*')
+    .eq('status', 'active')
+    .not('date_night_labels', 'eq', '{}')
+    .order('popularity_score', { ascending: false })
+    .limit(limit)
+
+  if (error) {
+    logError('Error fetching date night restaurants', error)
+    return []
+  }
+
+  return (data as Restaurant[]) ?? []
+}
+
+async function fetchFeaturedRestaurant(
+  supabase: ReturnType<typeof createAdminClient>,
+  dayOfYear: number
+): Promise<Restaurant | null> {
+  // Fetch all featured restaurants and rotate through them
+  const { data, error } = await supabase
+    .from('restaurants')
+    .select('*')
+    .eq('status', 'active')
+    .eq('featured', true)
+    .order('popularity_score', { ascending: false })
+
+  if (error) {
+    logError('Error fetching featured restaurants', error)
+    return null
+  }
+
+  const restaurants = (data as Restaurant[]) ?? []
+  if (restaurants.length === 0) return null
+
+  // Rotate based on day of year
+  return restaurants[dayOfYear % restaurants.length]
+}
+
+// ---------------------------------------------------------------------------
 // Duplicate detection
 // ---------------------------------------------------------------------------
 
@@ -360,6 +409,8 @@ type JobType =
   | 'monthly-roundup'
   | 'neighborhood-guide'
   | 'listicle'
+  | 'restaurant-spotlight'
+  | 'date-night-guide'
 
 function determineJobType(centralDate: ReturnType<typeof getCentralDate>): JobType {
   const isAM = centralDate.hour < 12
@@ -376,7 +427,13 @@ function determineJobType(centralDate: ReturnType<typeof getCentralDate>): JobTy
     return 'neighborhood-guide'
   }
 
-  // ── Afternoon run: always a listicle (rotates daily) ─────────────────
+  // ── Afternoon run: restaurant content twice per week ─────────────────
+  // Wednesday PM → restaurant spotlight (single restaurant deep-dive)
+  if (centralDate.dayOfWeek === 3) return 'restaurant-spotlight'
+  // Saturday PM → date night guide (restaurant + event pairings)
+  if (centralDate.dayOfWeek === 6) return 'date-night-guide'
+
+  // ── Other PM runs: listicle (rotates daily) ─────────────────
   return 'listicle'
 }
 
@@ -492,12 +549,162 @@ async function runBlogGeneration(): Promise<void> {
       })
     }
 
+    else if (jobType === 'restaurant-spotlight') {
+      // Wednesday PM: spotlight a featured restaurant
+      const dayOfYear = getDayOfYear(now)
+      const restaurant = await fetchFeaturedRestaurant(supabase, dayOfYear)
+
+      if (!restaurant) {
+        log('No featured restaurants available for spotlight. Falling back to listicle.')
+        // Fall back to a regular listicle
+        const listicleType = LISTICLE_ROTATION[getListicleRotationIndex(now)]
+        const events = await fetchEventsByCategory(supabase, 'food-dining')
+        const dateRangeLabel = formatMonthLabel(centralDate.year, centralDate.month)
+        const prompts = buildListiclePrompt({ type: listicleType, events, dateRangeLabel })
+        const hash = createHash('sha256').update(`${prompts.system}\n---\n${prompts.user}`).digest('hex')
+        if (await postHashExists(supabase, hash)) {
+          log('Duplicate post detected. Skipping.')
+          if (logId) await completeIngestionLog(supabase, logId, { status: 'completed', eventsCreated: 0, durationMs: Date.now() - startTime })
+          process.exit(0)
+        }
+        post = await generateBlogPost({
+          postType: 'listicle',
+          prompts,
+          relatedEventIds: events.slice(0, 10).map((e) => e.id),
+          category: listicleType,
+        })
+      } else {
+        log(`Restaurant spotlight: ${restaurant.name}`)
+
+        // Find events in the same neighborhood
+        const nearbyEvents = restaurant.neighborhood
+          ? await fetchEventsByNeighborhood(supabase, restaurant.neighborhood, 5)
+          : []
+
+        const signature = restaurant.signature_dishes.slice(0, 3).join(', ')
+        const labels = restaurant.date_night_labels.join(', ')
+
+        const system = `You are an expert Houston restaurant reviewer for ExploreHTX.
+You write engaging, detailed restaurant spotlights that help readers discover Houston's best dining experiences.
+Your tone is enthusiastic, knowledgeable, and practical — like a trusted friend recommending their favorite spot.
+
+Respond ONLY with a valid JSON object (no markdown fences, no extra text) using this exact schema:
+{
+  "title": "string — the post headline",
+  "excerpt": "string — 150–160 character meta description / post summary",
+  "content": "string — full markdown post body",
+  "keywords": ["array", "of", "seo", "keywords"],
+  "tags": ["array", "of", "short", "topic", "tags"]
+}`
+
+        const eventPairings = nearbyEvents.length > 0
+          ? `\n\nNearby events to pair with dinner:\n${nearbyEvents.map(e => `- ${e.title} (${e.venue_name || restaurant.neighborhood})`).join('\n')}`
+          : ''
+
+        const user = `Write a restaurant spotlight blog post for "${restaurant.name}" for ExploreHTX.
+
+Restaurant Details:
+- Name: ${restaurant.name}
+- Cuisine: ${restaurant.cuisine_type} (${restaurant.cuisine_tags.join(', ')})
+- Neighborhood: ${restaurant.neighborhood || 'Houston'}
+- Price: ${restaurant.price_range} (~$${restaurant.avg_price_per_person ?? 'varies'}/person)
+- Vibe: ${restaurant.ambiance.join(', ')}
+- Best For: ${labels}
+- Signature Dishes: ${signature}
+- Features: ${restaurant.features.join(', ')}
+- Dress Code: ${restaurant.dress_code || 'Smart casual'}
+- Description: ${restaurant.description}${eventPairings}
+
+Requirements:
+- Title: Engaging headline featuring the restaurant name (e.g., "${restaurant.name}: Houston's Best [Something] for [Occasion]")
+- Length: 600–900 words
+- Format:
+  1. Opening hook about what makes this restaurant special
+  2. "The Vibe" section: atmosphere, decor, who it's perfect for
+  3. "What to Order" section: 3–4 must-try dishes with descriptions
+  4. "Date Night Tips" section: reservations, dress code, parking, best times
+  5. ${nearbyEvents.length > 0 ? '"Pair It With" section: suggest nearby event + dinner combo' : 'Brief closing with reservation link CTA'}
+- Include internal link to /restaurants/${restaurant.slug} for full details
+- End with "Subscribe to ExploreHTX" CTA
+- Include 5–8 SEO keywords related to Houston dining, ${restaurant.cuisine_type} restaurants, date night
+- Include 4–6 tags`
+
+        const prompts = { system, user }
+        const hash = createHash('sha256').update(`${prompts.system}\n---\n${prompts.user}`).digest('hex')
+        if (await postHashExists(supabase, hash)) {
+          log('Duplicate post detected. Skipping.')
+          if (logId) await completeIngestionLog(supabase, logId, { status: 'completed', eventsCreated: 0, durationMs: Date.now() - startTime })
+          process.exit(0)
+        }
+
+        post = await generateBlogPost({
+          postType: 'restaurant_spotlight',
+          prompts,
+          relatedEventIds: nearbyEvents.slice(0, 5).map((e) => e.id),
+          relatedRestaurantIds: [restaurant.id],
+          category: restaurant.cuisine_type.toLowerCase().replace(/\s+/g, '-'),
+        })
+      }
+    }
+
+    else if (jobType === 'date-night-guide') {
+      // Saturday PM: comprehensive date night guide
+      const { start, end } = getUpcomingWeekendRange()
+      const dateRangeLabel = formatMonthLabel(centralDate.year, centralDate.month)
+
+      const [restaurants, events] = await Promise.all([
+        fetchDateNightRestaurants(supabase, 10),
+        fetchEventsInRange(supabase, start, end, 15),
+      ])
+
+      log(`Fetched ${restaurants.length} restaurants and ${events.length} events for date night guide`)
+
+      if (restaurants.length === 0) {
+        log('No date night restaurants available. Falling back to date-night listicle.')
+        const [nightlife, food] = await Promise.all([
+          fetchEventsByCategory(supabase, 'nightlife', 10),
+          fetchEventsByCategory(supabase, 'food-dining', 10),
+        ])
+        const allEvents = [...nightlife, ...food].slice(0, 20)
+        const prompts = buildListiclePrompt({ type: 'date-night', events: allEvents, dateRangeLabel })
+        const hash = createHash('sha256').update(`${prompts.system}\n---\n${prompts.user}`).digest('hex')
+        if (await postHashExists(supabase, hash)) {
+          log('Duplicate post detected. Skipping.')
+          if (logId) await completeIngestionLog(supabase, logId, { status: 'completed', eventsCreated: 0, durationMs: Date.now() - startTime })
+          process.exit(0)
+        }
+        post = await generateBlogPost({
+          postType: 'listicle',
+          prompts,
+          relatedEventIds: allEvents.slice(0, 10).map((e) => e.id),
+          category: 'date-night',
+        })
+      } else {
+        const prompts = buildDateNightGuidePrompt({ restaurants, events, dateRangeLabel })
+        const hash = createHash('sha256').update(`${prompts.system}\n---\n${prompts.user}`).digest('hex')
+        if (await postHashExists(supabase, hash)) {
+          log('Duplicate post detected. Skipping.')
+          if (logId) await completeIngestionLog(supabase, logId, { status: 'completed', eventsCreated: 0, durationMs: Date.now() - startTime })
+          process.exit(0)
+        }
+
+        post = await generateBlogPost({
+          postType: 'date_night_guide',
+          prompts,
+          relatedEventIds: events.slice(0, 10).map((e) => e.id),
+          relatedRestaurantIds: restaurants.slice(0, 10).map((r) => r.id),
+          category: 'date-night',
+        })
+      }
+    }
+
     else {
-      // listicle
+      // listicle (other PM days)
       const listicleType = LISTICLE_ROTATION[getListicleRotationIndex(now)]
       log(`Listicle type: ${listicleType}`)
 
       let events: Event[] = []
+      let restaurants: Restaurant[] | undefined
       const dateRangeLabel = formatMonthLabel(centralDate.year, centralDate.month)
 
       if (listicleType === 'free-events') {
@@ -505,12 +712,14 @@ async function runBlogGeneration(): Promise<void> {
       } else if (listicleType === 'family-events') {
         events = await fetchEventsByCategory(supabase, 'family-kids')
       } else if (listicleType === 'date-night') {
-        // Mix of nightlife + food for date night
-        const [nightlife, food] = await Promise.all([
+        // Mix of nightlife + food for date night, with restaurant recommendations
+        const [nightlife, food, dateNightRestaurants] = await Promise.all([
           fetchEventsByCategory(supabase, 'nightlife', 10),
           fetchEventsByCategory(supabase, 'food-dining', 10),
+          fetchDateNightRestaurants(supabase, 6),
         ])
         events = [...nightlife, ...food].slice(0, 20)
+        restaurants = dateNightRestaurants
       } else if (listicleType === 'outdoor-events') {
         events = await fetchEventsByCategory(supabase, 'outdoor-parks')
       } else if (listicleType === 'food-events') {
@@ -522,9 +731,9 @@ async function runBlogGeneration(): Promise<void> {
         events = await fetchEventsByCategory(supabase, 'arts-culture')
       }
 
-      log(`Fetched ${events.length} events for listicle (${listicleType})`)
+      log(`Fetched ${events.length} events for listicle (${listicleType})${restaurants ? ` and ${restaurants.length} restaurants` : ''}`)
 
-      const prompts = buildListiclePrompt({ type: listicleType, events, dateRangeLabel })
+      const prompts = buildListiclePrompt({ type: listicleType, events, restaurants, dateRangeLabel })
       const hash = createHash('sha256').update(`${prompts.system}\n---\n${prompts.user}`).digest('hex')
       if (await postHashExists(supabase, hash)) {
         log('Duplicate post detected. Skipping.')

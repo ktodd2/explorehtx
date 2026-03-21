@@ -15,6 +15,54 @@ export type BlogPostType =
   | 'seasonal_guide'
   | 'event_spotlight'
   | 'listicle'
+  | 'restaurant_spotlight'
+  | 'date_night_guide'
+
+// =============================================================================
+// Restaurant Types
+// =============================================================================
+
+export type PriceRange = '$' | '$$' | '$$$' | '$$$$'
+
+export type NoiseLevel = 'quiet' | 'moderate' | 'lively' | 'loud'
+
+export type RestaurantStatus = 'active' | 'archived' | 'coming_soon'
+
+/**
+ * Hours for a single day: { open: "11:00", close: "22:00" }
+ */
+export interface RestaurantDayHours {
+  open: string
+  close: string
+}
+
+/**
+ * Full week hours: keyed by lowercase day name
+ */
+export type RestaurantHours = Partial<
+  Record<
+    'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday',
+    RestaurantDayHours
+  >
+>
+
+/**
+ * Menu highlights organized by category
+ */
+export interface MenuHighlights {
+  appetizers?: string[]
+  mains?: string[]
+  pasta?: string[]
+  pizza?: string[]
+  'cold-tastings'?: string[]
+  'hot-tastings'?: string[]
+  sushi?: string[]
+  meats?: string[]
+  sides?: string[]
+  'small-plates'?: string[]
+  desserts?: string[]
+  [key: string]: string[] | undefined
+}
 
 export type BlogPostStatus = 'draft' | 'published' | 'archived'
 
@@ -104,6 +152,7 @@ export interface BlogPost {
   meta_description: string | null
   keywords: string[]
   related_event_ids: string[]
+  related_restaurant_ids: string[]
   status: BlogPostStatus
   published_at: string | null
   ai_generated: boolean
@@ -111,6 +160,64 @@ export interface BlogPost {
   ai_prompt_hash: string | null
   word_count: number | null
   reading_time_minutes: number | null
+  created_at: string
+  updated_at: string
+}
+
+/**
+ * Represents a row in the `restaurants` table.
+ */
+export interface Restaurant {
+  id: string
+  name: string
+  slug: string
+  description: string | null
+
+  // Location
+  address: string | null
+  neighborhood: string | null
+  lat: number | null
+  lng: number | null
+
+  // Contact
+  phone: string | null
+  website_url: string | null
+  reservation_url: string | null
+  menu_url: string | null
+
+  // Cuisine
+  cuisine_type: string
+  cuisine_tags: string[]
+
+  // Pricing
+  price_range: PriceRange
+  avg_price_per_person: number | null
+
+  // Hours
+  hours: RestaurantHours
+
+  // Ambiance & Features
+  ambiance: string[]
+  features: string[]
+  dress_code: string | null
+  noise_level: NoiseLevel | null
+
+  // Date Night
+  date_night_labels: string[]
+  best_for: string[]
+
+  // Menu
+  signature_dishes: string[]
+  menu_highlights: MenuHighlights
+
+  // Media
+  image_url: string | null
+  gallery_urls: string[]
+
+  // Metadata
+  status: RestaurantStatus
+  featured: boolean
+  popularity_score: number
   created_at: string
   updated_at: string
 }
@@ -227,8 +334,18 @@ export type InsertSubscriber = Omit<
   >
 
 /**
+ * Payload for creating a new restaurant. Omits server-managed fields.
+ */
+export type InsertRestaurant = Omit<
+  Restaurant,
+  'id' | 'created_at' | 'updated_at'
+> &
+  Partial<Pick<Restaurant, 'id' | 'created_at' | 'updated_at'>>
+
+/**
  * Generic partial update types — all fields optional except the primary key.
  */
 export type UpdateEvent = Partial<Omit<Event, 'id'>>
 export type UpdateBlogPost = Partial<Omit<BlogPost, 'id'>>
 export type UpdateSubscriber = Partial<Omit<Subscriber, 'id'>>
+export type UpdateRestaurant = Partial<Omit<Restaurant, 'id'>>
