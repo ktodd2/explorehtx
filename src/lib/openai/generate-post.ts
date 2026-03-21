@@ -25,6 +25,7 @@ interface GeneratePostOptions {
   prompts: PromptMessages
   relatedEventIds?: string[]
   relatedRestaurantIds?: string[]
+  relatedAttractionIds?: string[]
   category?: string
 }
 
@@ -81,7 +82,7 @@ function readingTime(wordCount: number): number {
 export async function generateBlogPost(
   options: GeneratePostOptions
 ): Promise<InsertBlogPost> {
-  const { postType, prompts, relatedEventIds = [], relatedRestaurantIds = [], category } = options
+  const { postType, prompts, relatedEventIds = [], relatedRestaurantIds = [], relatedAttractionIds = [], category } = options
 
   const promptHash = hashPrompt(prompts.system, prompts.user)
 
@@ -151,6 +152,7 @@ export async function generateBlogPost(
     keywords,
     related_event_ids: relatedEventIds,
     related_restaurant_ids: relatedRestaurantIds,
+    related_attraction_ids: relatedAttractionIds,
     status: 'published',
     published_at: now,
     ai_generated: true,

@@ -17,6 +17,7 @@ export type BlogPostType =
   | 'listicle'
   | 'restaurant_spotlight'
   | 'date_night_guide'
+  | 'attraction_spotlight'
 
 // =============================================================================
 // Restaurant Types
@@ -27,6 +28,32 @@ export type PriceRange = '$' | '$$' | '$$$' | '$$$$'
 export type NoiseLevel = 'quiet' | 'moderate' | 'lively' | 'loud'
 
 export type RestaurantStatus = 'active' | 'archived' | 'coming_soon'
+
+// =============================================================================
+// Attraction Types
+// =============================================================================
+
+export type AttractionPriceType = 'free' | 'paid' | 'donation' | 'varies'
+
+export type AttractionStatus = 'active' | 'archived' | 'coming_soon'
+
+/**
+ * Hours for a single day: { open: "09:00", close: "17:00" }
+ */
+export interface AttractionDayHours {
+  open: string
+  close: string
+}
+
+/**
+ * Full week hours for attractions: keyed by lowercase day name
+ */
+export type AttractionHours = Partial<
+  Record<
+    'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday',
+    AttractionDayHours
+  >
+>
 
 /**
  * Hours for a single day: { open: "11:00", close: "22:00" }
@@ -153,6 +180,7 @@ export interface BlogPost {
   keywords: string[]
   related_event_ids: string[]
   related_restaurant_ids: string[]
+  related_attraction_ids: string[]
   status: BlogPostStatus
   published_at: string | null
   ai_generated: boolean
@@ -220,6 +248,79 @@ export interface Restaurant {
   popularity_score: number
   created_at: string
   updated_at: string
+}
+
+/**
+ * Represents a row in the `attraction_categories` table.
+ */
+export interface AttractionCategory {
+  id: string
+  name: string
+  slug: string
+  description: string | null
+  icon: string | null
+  display_order: number
+  created_at: string
+  updated_at: string
+}
+
+/**
+ * Represents a row in the `attractions` table.
+ */
+export interface Attraction {
+  id: string
+  name: string
+  slug: string
+  description: string | null
+  short_description: string | null
+
+  // Location
+  address: string | null
+  neighborhood: string | null
+  lat: number | null
+  lng: number | null
+
+  // Contact
+  phone: string | null
+  website_url: string | null
+
+  // Category & Tags
+  category_id: string | null
+  tags: string[]
+
+  // Pricing
+  price_type: AttractionPriceType
+  price_range: string | null
+  price_notes: string | null
+
+  // Hours
+  hours: AttractionHours
+  seasonal_notes: string | null
+
+  // Features
+  features: string[]
+  accessibility: string[]
+  best_for: string[]
+  duration_minutes: number | null
+
+  // Media
+  image_url: string | null
+  image_alt: string | null
+  gallery_urls: string[]
+
+  // Metadata
+  status: AttractionStatus
+  featured: boolean
+  popularity_score: number
+  created_at: string
+  updated_at: string
+}
+
+/**
+ * Attraction with its category joined (for display purposes)
+ */
+export interface AttractionWithCategory extends Attraction {
+  category: AttractionCategory | null
 }
 
 /**
@@ -343,9 +444,29 @@ export type InsertRestaurant = Omit<
   Partial<Pick<Restaurant, 'id' | 'created_at' | 'updated_at'>>
 
 /**
+ * Payload for creating a new attraction. Omits server-managed fields.
+ */
+export type InsertAttraction = Omit<
+  Attraction,
+  'id' | 'created_at' | 'updated_at'
+> &
+  Partial<Pick<Attraction, 'id' | 'created_at' | 'updated_at'>>
+
+/**
+ * Payload for creating a new attraction category. Omits server-managed fields.
+ */
+export type InsertAttractionCategory = Omit<
+  AttractionCategory,
+  'id' | 'created_at' | 'updated_at'
+> &
+  Partial<Pick<AttractionCategory, 'id' | 'created_at' | 'updated_at'>>
+
+/**
  * Generic partial update types — all fields optional except the primary key.
  */
 export type UpdateEvent = Partial<Omit<Event, 'id'>>
 export type UpdateBlogPost = Partial<Omit<BlogPost, 'id'>>
 export type UpdateSubscriber = Partial<Omit<Subscriber, 'id'>>
 export type UpdateRestaurant = Partial<Omit<Restaurant, 'id'>>
+export type UpdateAttraction = Partial<Omit<Attraction, 'id'>>
+export type UpdateAttractionCategory = Partial<Omit<AttractionCategory, 'id'>>

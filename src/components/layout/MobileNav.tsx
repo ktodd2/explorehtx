@@ -2,14 +2,14 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Menu, X, MapPin, Calendar, Newspaper, Star, Info, Utensils } from 'lucide-react';
+import { Menu, X, MapPin, Calendar, Newspaper, Compass, Info, Utensils } from 'lucide-react';
 
 const navLinks = [
   { href: '/events', label: 'Events', icon: Calendar },
   { href: '/restaurants', label: 'Restaurants', icon: Utensils },
   { href: '/blog', label: 'Blog', icon: Newspaper },
   { href: '/neighborhoods', label: 'Neighborhoods', icon: MapPin },
-  { href: '/things-to-do', label: 'Things To Do', icon: Star },
+  { href: '/things-to-do', label: 'Things To Do', icon: Compass },
   { href: '/about', label: 'About', icon: Info },
 ];
 

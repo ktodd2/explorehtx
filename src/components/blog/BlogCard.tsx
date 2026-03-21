@@ -16,6 +16,7 @@ const POST_TYPE_LABELS: Record<BlogPostType, string> = {
   listicle: 'List',
   restaurant_spotlight: 'Restaurant Spotlight',
   date_night_guide: 'Date Night Guide',
+  attraction_spotlight: 'Attraction Spotlight',
 }
 
 /** Map post types to badge color classes */
@@ -27,6 +28,7 @@ const POST_TYPE_BADGE_COLORS: Record<BlogPostType, string> = {
   listicle: 'bg-amber-100 text-amber-700',
   restaurant_spotlight: 'bg-rose-100 text-rose-700',
   date_night_guide: 'bg-pink-100 text-pink-700',
+  attraction_spotlight: 'bg-teal-100 text-teal-700',
 }
 
 /** Map post types to gradient classes for cover image placeholders */
@@ -38,6 +40,7 @@ const POST_TYPE_GRADIENTS: Record<BlogPostType, string> = {
   listicle: 'from-amber-400 to-amber-700',
   restaurant_spotlight: 'from-rose-400 to-rose-700',
   date_night_guide: 'from-pink-400 to-pink-700',
+  attraction_spotlight: 'from-teal-400 to-teal-700',
 }
 
 function formatPublishedDate(dateStr: string): string {

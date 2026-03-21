@@ -28,7 +28,8 @@ import {
 }                                       from '../lib/openai/prompts/neighborhood-guide'
 import { buildListiclePrompt }          from '../lib/openai/prompts/listicle'
 import { buildDateNightGuidePrompt }    from '../lib/openai/prompts/date-night-guide'
-import type { Event, InsertBlogPost, Restaurant } from '../types/database'
+import { buildAttractionSpotlightPrompt } from '../lib/openai/prompts/attraction-spotlight'
+import type { Event, InsertBlogPost, Restaurant, Attraction, AttractionCategory } from '../types/database'
 import type { ListicleType }            from '../lib/openai/prompts/listicle'
 
 // ---------------------------------------------------------------------------
@@ -286,6 +287,47 @@ async function fetchFeaturedRestaurant(
 }
 
 // ---------------------------------------------------------------------------
+// Attraction fetch helpers
+// ---------------------------------------------------------------------------
+
+async function fetchFeaturedAttraction(
+  supabase: ReturnType<typeof createAdminClient>,
+  dayOfYear: number
+): Promise<{ attraction: Attraction; category: AttractionCategory | null } | null> {
+  // Fetch all featured attractions and rotate through them
+  const { data, error } = await supabase
+    .from('attractions')
+    .select('*')
+    .eq('status', 'active')
+    .eq('featured', true)
+    .order('popularity_score', { ascending: false })
+
+  if (error) {
+    logError('Error fetching featured attractions', error)
+    return null
+  }
+
+  const attractions = (data as Attraction[]) ?? []
+  if (attractions.length === 0) return null
+
+  // Rotate based on day of year
+  const attraction = attractions[dayOfYear % attractions.length]
+
+  // Fetch category if exists
+  let category: AttractionCategory | null = null
+  if (attraction.category_id) {
+    const { data: catData } = await supabase
+      .from('attraction_categories')
+      .select('*')
+      .eq('id', attraction.category_id)
+      .single()
+    category = catData as AttractionCategory | null
+  }
+
+  return { attraction, category }
+}
+
+// ---------------------------------------------------------------------------
 // Duplicate detection
 // ---------------------------------------------------------------------------
 
@@ -411,6 +453,7 @@ type JobType =
   | 'listicle'
   | 'restaurant-spotlight'
   | 'date-night-guide'
+  | 'attraction-spotlight'
 
 function determineJobType(centralDate: ReturnType<typeof getCentralDate>): JobType {
   const isAM = centralDate.hour < 12
@@ -427,9 +470,11 @@ function determineJobType(centralDate: ReturnType<typeof getCentralDate>): JobTy
     return 'neighborhood-guide'
   }
 
-  // ── Afternoon run: restaurant content twice per week ─────────────────
+  // ── Afternoon run: featured content ─────────────────
   // Wednesday PM → restaurant spotlight (single restaurant deep-dive)
   if (centralDate.dayOfWeek === 3) return 'restaurant-spotlight'
+  // Thursday PM → attraction spotlight (single attraction deep-dive)
+  if (centralDate.dayOfWeek === 4) return 'attraction-spotlight'
   // Saturday PM → date night guide (restaurant + event pairings)
   if (centralDate.dayOfWeek === 6) return 'date-night-guide'
 
@@ -694,6 +739,61 @@ Requirements:
           relatedEventIds: events.slice(0, 10).map((e) => e.id),
           relatedRestaurantIds: restaurants.slice(0, 10).map((r) => r.id),
           category: 'date-night',
+        })
+      }
+    }
+
+    else if (jobType === 'attraction-spotlight') {
+      // Thursday PM: spotlight a featured attraction
+      const dayOfYear = getDayOfYear(now)
+      const result = await fetchFeaturedAttraction(supabase, dayOfYear)
+
+      if (!result) {
+        log('No featured attractions available for spotlight. Falling back to listicle.')
+        // Fall back to a regular listicle
+        const listicleType = LISTICLE_ROTATION[getListicleRotationIndex(now)]
+        const events = await fetchEventsByCategory(supabase, 'outdoor-parks')
+        const dateRangeLabel = formatMonthLabel(centralDate.year, centralDate.month)
+        const prompts = buildListiclePrompt({ type: listicleType, events, dateRangeLabel })
+        const hash = createHash('sha256').update(`${prompts.system}\n---\n${prompts.user}`).digest('hex')
+        if (await postHashExists(supabase, hash)) {
+          log('Duplicate post detected. Skipping.')
+          if (logId) await completeIngestionLog(supabase, logId, { status: 'completed', eventsCreated: 0, durationMs: Date.now() - startTime })
+          process.exit(0)
+        }
+        post = await generateBlogPost({
+          postType: 'listicle',
+          prompts,
+          relatedEventIds: events.slice(0, 10).map((e) => e.id),
+          category: listicleType,
+        })
+      } else {
+        const { attraction, category } = result
+        log(`Attraction spotlight: ${attraction.name}`)
+
+        // Find events in the same neighborhood
+        const nearbyEvents = attraction.neighborhood
+          ? await fetchEventsByNeighborhood(supabase, attraction.neighborhood, 5)
+          : []
+
+        const prompts = buildAttractionSpotlightPrompt({
+          attraction,
+          category,
+          nearbyEvents,
+        })
+        const hash = createHash('sha256').update(`${prompts.system}\n---\n${prompts.user}`).digest('hex')
+        if (await postHashExists(supabase, hash)) {
+          log('Duplicate post detected. Skipping.')
+          if (logId) await completeIngestionLog(supabase, logId, { status: 'completed', eventsCreated: 0, durationMs: Date.now() - startTime })
+          process.exit(0)
+        }
+
+        post = await generateBlogPost({
+          postType: 'attraction_spotlight',
+          prompts,
+          relatedEventIds: nearbyEvents.slice(0, 5).map((e) => e.id),
+          relatedAttractionIds: [attraction.id],
+          category: category?.slug ?? 'attractions',
         })
       }
     }

@@ -50,6 +50,7 @@ const POST_TYPE_LABELS: Record<BlogPostType, string> = {
   listicle: 'List',
   restaurant_spotlight: 'Restaurant Spotlight',
   date_night_guide: 'Date Night Guide',
+  attraction_spotlight: 'Attraction Spotlight',
 }
 
 const POST_TYPE_BADGE_COLORS: Record<BlogPostType, string> = {
@@ -60,6 +61,7 @@ const POST_TYPE_BADGE_COLORS: Record<BlogPostType, string> = {
   listicle: 'bg-amber-100 text-amber-700',
   restaurant_spotlight: 'bg-rose-100 text-rose-700',
   date_night_guide: 'bg-pink-100 text-pink-700',
+  attraction_spotlight: 'bg-teal-100 text-teal-700',
 }
 
 const POST_TYPE_HERO_GRADIENT: Record<BlogPostType, string> = {
@@ -70,6 +72,7 @@ const POST_TYPE_HERO_GRADIENT: Record<BlogPostType, string> = {
   listicle: 'from-amber-600 to-amber-900',
   restaurant_spotlight: 'from-rose-600 to-rose-900',
   date_night_guide: 'from-pink-600 to-pink-900',
+  attraction_spotlight: 'from-teal-600 to-teal-900',
 }
 
 function formatPublishedDate(dateStr: string): string {
