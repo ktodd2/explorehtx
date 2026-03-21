@@ -3,11 +3,11 @@ import { MapPin, Mail, Instagram, Twitter, Facebook, Youtube, Heart } from 'luci
 
 const quickLinks = [
   { href: '/events', label: 'Upcoming Events' },
+  { href: '/saved', label: 'Saved Events' },
   { href: '/restaurants', label: 'Restaurants' },
   { href: '/things-to-do', label: 'Things To Do' },
   { href: '/blog', label: 'Blog & Stories' },
   { href: '/neighborhoods', label: 'Neighborhoods' },
-  { href: '/about', label: 'About Us' },
 ];
 
 const eventFilters = [
@@ -15,8 +15,8 @@ const eventFilters = [
   { href: '/events/this-weekend', label: 'This Weekend' },
   { href: '/events/this-week', label: 'This Week' },
   { href: '/events/free', label: 'Free Events' },
+  { href: '/events/live-music', label: 'Live Music' },
   { href: '/restaurants/date-night', label: 'Date Night Restaurants' },
-  { href: '/things-to-do/free', label: 'Free Things To Do' },
 ];
 
 const categories = [

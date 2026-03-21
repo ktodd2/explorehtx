@@ -18,6 +18,8 @@ import {
 import { createClient } from '@/lib/supabase/server';
 import EventJsonLd from '@/components/events/EventJsonLd';
 import EventCard from '@/components/events/EventCard';
+import AddToCalendarButton from '@/components/events/AddToCalendarButton';
+import SaveEventButton from '@/components/events/SaveEventButton';
 import BreadcrumbJsonLd from '@/components/seo/BreadcrumbJsonLd';
 import { formatDateRange, formatEventDate } from '@/lib/utils/dates';
 import { formatPrice, categoryDisplayName, truncate } from '@/lib/utils/format';
@@ -398,6 +400,19 @@ export default async function EventDetailPage({ params }: PageProps) {
                     Get Tickets
                   </a>
                 )}
+              </div>
+
+              {/* Add to Calendar + Save */}
+              <div className="flex flex-wrap gap-2">
+                <AddToCalendarButton
+                  title={event.title}
+                  description={event.description ?? ''}
+                  startDate={event.start_date}
+                  endDate={event.end_date}
+                  location={event.venue_name ? `${event.venue_name}${event.venue_address ? `, ${event.venue_address}` : ''}` : event.venue_address ?? 'Houston, TX'}
+                  url={pageUrl}
+                />
+                <SaveEventButton eventId={event.id} showLabel />
               </div>
 
               <hr className="border-gray-100" />

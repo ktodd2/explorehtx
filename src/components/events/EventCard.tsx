@@ -4,6 +4,7 @@ import { Calendar, MapPin, Tag } from 'lucide-react';
 import type { Event } from '@/types/database';
 import { formatEventDate } from '@/lib/utils/dates';
 import { formatPrice, truncate, categoryDisplayName } from '@/lib/utils/format';
+import SaveEventButton from './SaveEventButton';
 
 interface EventCardProps {
   event: Event;
@@ -83,6 +84,11 @@ export default function EventCard({ event }: EventCardProps) {
             </span>
           </div>
         )}
+
+        {/* Save button */}
+        <div className="absolute bottom-3 right-3">
+          <SaveEventButton eventId={event.id} size="sm" />
+        </div>
       </div>
 
       {/* Card body */}

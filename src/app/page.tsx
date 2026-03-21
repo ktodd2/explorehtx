@@ -17,6 +17,7 @@ import {
   MapPin,
   Clock,
   Sparkles,
+  Flame,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import EventCard from '@/components/events/EventCard';
@@ -50,13 +51,21 @@ const QUICK_LINKS = [
 export default async function Home() {
   const supabase = await createClient();
 
-  const [eventsResult, blogResult] = await Promise.all([
+  const [eventsResult, trendingResult, blogResult] = await Promise.all([
     supabase
       .from('events')
       .select('*')
       .eq('status', 'active')
       .gte('start_date', new Date().toISOString())
       .order('featured', { ascending: false })
+      .order('start_date', { ascending: true })
+      .limit(6),
+    supabase
+      .from('events')
+      .select('*')
+      .eq('status', 'active')
+      .gte('start_date', new Date().toISOString())
+      .order('popularity_score', { ascending: false })
       .order('start_date', { ascending: true })
       .limit(6),
     supabase
@@ -68,6 +77,7 @@ export default async function Home() {
   ]);
 
   const events = (eventsResult.data as Event[]) ?? [];
+  const trendingEvents = (trendingResult.data as Event[]) ?? [];
   const blogPosts = (blogResult.data as BlogPost[]) ?? [];
 
   return (
@@ -184,6 +194,39 @@ export default async function Home() {
           </Link>
         </div>
       </section>
+
+      {/* Trending This Week */}
+      {trendingEvents.length > 0 && (
+        <section className="bg-gradient-to-br from-orange-50 to-amber-50 py-16 sm:py-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center">
+                  <Flame className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h2 className="font-display text-3xl sm:text-4xl font-bold text-gray-900">
+                    Trending This Week
+                  </h2>
+                  <p className="mt-1 text-gray-600">Most popular events in Houston</p>
+                </div>
+              </div>
+              <Link
+                href="/events"
+                className="hidden sm:inline-flex items-center gap-2 text-sunset-orange-600 hover:text-sunset-orange-700 font-medium transition-colors"
+              >
+                View All
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {trendingEvents.map((event) => (
+                <EventCard key={event.id} event={event} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Browse by Category */}
       <section className="bg-gray-50 py-16 sm:py-20">

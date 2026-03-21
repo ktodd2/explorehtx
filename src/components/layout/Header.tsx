@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { MapPin, Calendar } from 'lucide-react';
 import MobileNav from './MobileNav';
+import SavedEventsLink from './SavedEventsLink';
 
 const navLinks = [
   { href: '/events', label: 'Events' },
@@ -55,6 +56,11 @@ export default function Header() {
               <Calendar size={15} className="text-sunset-orange-400" />
               <span>Events</span>
             </Link>
+
+            {/* Saved events link */}
+            <div className="hidden md:block">
+              <SavedEventsLink />
+            </div>
 
             {/* Subscribe CTA — desktop */}
             <Link
