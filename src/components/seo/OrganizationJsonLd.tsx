@@ -11,28 +11,21 @@ export default function OrganizationJsonLd() {
     name: 'ExploreHTX',
     alternateName: 'Explore HTX',
     url: BASE_URL,
-    logo: `${BASE_URL}/images/logo.png`,
     description:
       'Your ultimate guide to Houston events, restaurants, nightlife, and things to do in the Bayou City.',
-    sameAs: [
-      'https://instagram.com/explorehtx',
-      'https://twitter.com/explorehtx',
-      'https://facebook.com/explorehtx',
-      'https://youtube.com/@explorehtx',
-    ],
-    contactPoint: {
-      '@type': 'ContactPoint',
-      contactType: 'customer service',
-      email: 'hello@explorehtx.us.com',
-      availableLanguage: 'English',
-    },
     foundingDate: '2024',
+    areaServed: {
+      '@type': 'AdministrativeArea',
+      name: 'Greater Houston Area',
+    },
     knowsAbout: [
       'Houston Events',
       'Houston Restaurants',
       'Houston Nightlife',
       'Houston Things To Do',
       'Houston Neighborhoods',
+      'Houston Happy Hours',
+      'Houston Live Music',
     ],
   };
 

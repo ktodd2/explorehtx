@@ -23,7 +23,6 @@ import { createClient } from '@/lib/supabase/server';
 import EventCard from '@/components/events/EventCard';
 import BlogCard from '@/components/blog/BlogCard';
 import OrganizationJsonLd from '@/components/seo/OrganizationJsonLd';
-import LocalBusinessJsonLd from '@/components/seo/LocalBusinessJsonLd';
 import type { Event, BlogPost } from '@/types/database';
 
 const CATEGORIES = [
@@ -83,7 +82,6 @@ export default async function Home() {
   return (
     <>
       <OrganizationJsonLd />
-      <LocalBusinessJsonLd />
 
       {/* Hero Section */}
       <section className="relative bg-space-blue-900 overflow-hidden">
